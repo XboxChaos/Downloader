@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -8,8 +9,12 @@ using Caliburn.Micro;
 
 namespace Downloader.ViewModels
 {
-	class AppViewModel : Conductor<object>
+	[Export(typeof(IShell))]
+	class AppViewModel : Conductor<object>.Collection.OneActive, IShell
 	{
+		private bool _canNext;
+		private bool _canBack;
+
 		public AppViewModel()
 		{
 			base.DisplayName = "Xbox Chaos Downloader";
@@ -17,25 +22,35 @@ namespace Downloader.ViewModels
 
 		protected override void OnActivate()
 		{
-			ActivateItem(new SelectBranchViewModel());
+			ActivateItem(new SelectBranchViewModel(this));
 		}
 
-		public bool CanBack
+		public bool CanGoBack
 		{
-			get { return false; }
+			get { return _canBack; }
+			set
+			{
+				_canBack = value;
+				NotifyOfPropertyChange(() => CanGoBack);
+			}
 		}
 
-		public void Back()
+		public void GoBack()
 		{
 			
 		}
 
-		public bool CanNext
+		public bool CanGoForward
 		{
-			get { return true; }
+			get { return _canNext; }
+			set
+			{
+				_canNext = value;
+				NotifyOfPropertyChange(() => CanGoForward);
+			}
 		}
 
-		public void Next()
+		public void GoForward()
 		{
 			
 		}

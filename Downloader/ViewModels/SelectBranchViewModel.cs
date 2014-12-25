@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,19 +10,37 @@ namespace Downloader.ViewModels
 {
 	class SelectBranchViewModel : Screen
 	{
-		public SelectBranchViewModel()
+		private readonly IShell _shell;
+		private AvailableBranch _selectedBranch;
+
+		[ImportingConstructor]
+		public SelectBranchViewModel(IShell shell)
 		{
+			_shell = shell;
 			Branches = new BindableCollection<AvailableBranch>()
 			{
 				new AvailableBranch() { Name = "master (Recommended)", LatestVersion = "2014.12.34.56.78.90-master"},
 				new AvailableBranch() { Name = "dev", LatestVersion = "2014.12.34.56.78.90-dev"},
 			};
-			SelectedBranch = Branches[0];
 		}
 
-		public AvailableBranch SelectedBranch { get; set; }
+		public AvailableBranch SelectedBranch
+		{
+			get { return _selectedBranch; }
+			set
+			{
+				_selectedBranch = value;
+				NotifyOfPropertyChange(() => SelectedBranch);
+				_shell.CanGoForward = (_selectedBranch != null);
+			}
+		}
 
-		public BindableCollection<AvailableBranch> Branches { get; set; } 
+		public BindableCollection<AvailableBranch> Branches { get; set; }
+
+		protected override void OnActivate()
+		{
+			_shell.CanGoForward = (SelectedBranch != null);
+		}
 	}
 
 	class AvailableBranch
