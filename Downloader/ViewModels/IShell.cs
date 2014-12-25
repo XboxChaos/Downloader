@@ -8,8 +8,8 @@ namespace Downloader.ViewModels
 {
 	interface IShell
 	{
-		bool CanGoBack { get; set; }
-
 		bool CanGoForward { get; set; }
+
+		void GoForward();
 	}
 }

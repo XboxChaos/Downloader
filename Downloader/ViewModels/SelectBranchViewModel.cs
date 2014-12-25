@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Caliburn.Micro;
 
 namespace Downloader.ViewModels
@@ -40,6 +40,7 @@ namespace Downloader.ViewModels
 		protected override void OnActivate()
 		{
 			_shell.CanGoForward = (SelectedBranch != null);
+			base.OnActivate();
 		}
 	}
 

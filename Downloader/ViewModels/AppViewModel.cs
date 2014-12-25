@@ -12,17 +12,22 @@ namespace Downloader.ViewModels
 	[Export(typeof(IShell))]
 	class AppViewModel : Conductor<object>.Collection.OneActive, IShell
 	{
+		private readonly Screen[] _screens;
+		private int _currentScreen;
+
 		private bool _canNext;
 		private bool _canBack;
 
+		[ImportingConstructor]
 		public AppViewModel()
 		{
 			base.DisplayName = "Xbox Chaos Downloader";
-		}
-
-		protected override void OnActivate()
-		{
-			ActivateItem(new SelectBranchViewModel(this));
+			_screens = new Screen[]
+			{
+				new SelectBranchViewModel(this),
+ 				new SelectFolderViewModel(this), 
+			};
+			base.ActivateItem(_screens[0]);
 		}
 
 		public bool CanGoBack
@@ -37,7 +42,12 @@ namespace Downloader.ViewModels
 
 		public void GoBack()
 		{
-			
+			if (_currentScreen <= 0)
+				return;
+			_currentScreen--;
+			CanGoBack = (_currentScreen > 0);
+			ActivateItem(_screens[_currentScreen]);
+			NotifyOfPropertyChange(() => ForwardText);
 		}
 
 		public bool CanGoForward
@@ -52,7 +62,18 @@ namespace Downloader.ViewModels
 
 		public void GoForward()
 		{
-			
+			_currentScreen++;
+			CanGoBack = (_currentScreen > 0);
+			if (_currentScreen < _screens.Length)
+				ActivateItem(_screens[_currentScreen]);
+			else
+				TryClose();
+			NotifyOfPropertyChange(() => ForwardText);
+		}
+
+		public string ForwardText
+		{
+			get { return (_currentScreen < _screens.Length - 1) ? "Next" : "Finish"; }
 		}
 
 		public void XboxChaos()

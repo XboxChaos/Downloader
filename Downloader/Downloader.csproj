@@ -73,11 +73,15 @@
     <Compile Include="ViewModels\AppViewModel.cs" />
     <Compile Include="ViewModels\IShell.cs" />
     <Compile Include="ViewModels\SelectBranchViewModel.cs" />
+    <Compile Include="ViewModels\SelectFolderViewModel.cs" />
     <Compile Include="Views\AppView.xaml.cs">
       <DependentUpon>AppView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\SelectBranchView.xaml.cs">
       <DependentUpon>SelectBranchView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SelectFolderView.xaml.cs">
+      <DependentUpon>SelectFolderView.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -115,6 +119,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\SelectBranchView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\SelectFolderView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

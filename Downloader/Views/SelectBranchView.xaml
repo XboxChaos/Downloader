@@ -4,13 +4,13 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" d:DesignWidth="636" d:DesignHeight="264">
-	<Grid Margin="12 12 12 12">
+	<Grid Margin="12">
 		<Grid.RowDefinitions>
 			<RowDefinition Height="Auto"/>
 			<RowDefinition Height="*"/>
 		</Grid.RowDefinitions>
 		<TextBlock Grid.Row="0" Text="Please select the branch you wish to download:"/>
-		<ListView x:Name="Branches" SelectedItem="{Binding SelectedBranch}" Grid.Row="1" Margin="0 12 0 0">
+		<ListView x:Name="Branches" SelectedItem="{Binding SelectedBranch}" ItemsSource="{Binding Branches}" Grid.Row="1" Margin="0 12 0 0">
 			<ListView.ItemTemplate>
 				<DataTemplate>
 					<StackPanel>
