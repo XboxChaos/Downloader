@@ -1,0 +1,64 @@
+﻿<UserControl x:Class="Downloader.Views.AppView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" Width="640" Height="362">
+	<UserControl.Resources>
+		<ResourceDictionary>
+			<Style x:Key="ImageLink" TargetType="Button">
+				<Setter Property="OverridesDefaultStyle" Value="True"/>
+				<Setter Property="Cursor" Value="Hand"/>
+				<Setter Property="Opacity" Value="0.5"/>
+				<Setter Property="Background" Value="Transparent"/>
+				<Setter Property="Template">
+					<Setter.Value>
+						<ControlTemplate TargetType="{x:Type Button}">
+							<Border Background="{TemplateBinding Background}">
+								<ContentPresenter />
+							</Border>
+						</ControlTemplate>
+					</Setter.Value>
+				</Setter>
+				<Style.Triggers>
+					<Trigger Property="IsMouseOver" Value="True">
+						<Setter Property="Opacity" Value="1"/>
+					</Trigger>
+				</Style.Triggers>
+			</Style>
+		</ResourceDictionary>
+	</UserControl.Resources>
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="49"/>
+			<RowDefinition Height="*"/>
+			<RowDefinition Height="49"/>
+		</Grid.RowDefinitions>
+		<Border BorderThickness="0 0 0 1" BorderBrush="LightGray" Grid.Row="0" Padding="12">
+			<TextBlock FontSize="16" VerticalAlignment="Center">Assembly - Multi-Generation Blam Engine Research Tool</TextBlock>
+		</Border>
+		<ContentControl Grid.Row="1" x:Name="ActiveItem"/>
+		<Border BorderThickness="0 1 0 0" BorderBrush="LightGray" Grid.Row="2" Padding="12">
+			<Grid>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="Auto"/>
+				</Grid.ColumnDefinitions>
+				<StackPanel Grid.Column="0" Orientation="Horizontal">
+					<Button Name="XboxChaos" Style="{StaticResource ImageLink}" ToolTip="XboxChaos.com">
+						<Path Data="F1M435.844,328.128L435.844,328.451C435.844,328.451,653.003,505.779,754.404,706.008L762.687,723.068 757.995,728.484C678.421,816.035 563.63,871 436,871 308.37,871 193.579,816.035 114.005,728.484L109.073,722.79 117.44,705.557C215.672,511.586,422.541,339.105,435.374,328.515z M715.025,102.346L728.484,114.005C816.035,193.579 871,308.37 871,436 871,526.091 843.612,609.786 796.709,679.213L785.132,695.493 785.181,694.59C786.508,663.55 781.953,486.603 533.844,243.451 533.844,243.451 602.535,160.896 697.511,110.968z M157.25,102.108L174.333,110.517C269.309,160.445 338,243 338,243 89.891,486.153 85.336,663.099 86.663,694.139L86.726,695.293 75.291,679.213C28.388,609.786 1,526.091 1,436 1,308.37 55.965,193.579 143.516,114.005z M436,1C511.076,1,581.71,20.019,643.347,53.502L654.792,60.083 653.803,60.038C636.197,59.481,571.808,64.321,450.138,145.716L436,155.345 436,155C309.908,67.612,241.501,59.514,220.281,59.55L218.072,59.586 228.653,53.502C290.29,20.019,360.924,1,436,1z"
+							  Fill="DarkGray" Stretch="Uniform"/>
+					</Button>
+					<Button Name="GitHub" Style="{StaticResource ImageLink}" Margin="12 0 0 0" ToolTip="Xbox Chaos on GitHub">
+						<Path Data="M16.288,0C7.293,0 0,7.293 0,16.29 0,23.487 4.667,29.592 11.14,31.747 11.955,31.896 12.252,31.393 12.252,30.961 12.252,30.575 12.238,29.55 12.23,28.191 7.699,29.175 6.743,26.007 6.743,26.007 6.002,24.125 4.934,23.624 4.934,23.624 3.455,22.614 5.046,22.634 5.046,22.634 6.681,22.749 7.541,24.313 7.541,24.313 8.994,26.802 11.354,26.083 12.282,25.666 12.43,24.614 12.85,23.896 13.316,23.489 9.699,23.078 5.896,21.68 5.896,15.438 5.896,13.66 6.531,12.206 7.573,11.067 7.405,10.655 6.846,8.999 7.732,6.756 7.732,6.756 9.1,6.318 12.212,8.426 13.511,8.064 14.905,7.884 16.29,7.878 17.673,7.884 19.067,8.064 20.368,8.426 23.478,6.318 24.843,6.756 24.843,6.756 25.732,8.999 25.173,10.655 25.005,11.067 26.049,12.206 26.68,13.66 26.68,15.438 26.68,21.696 22.871,23.073 19.242,23.476 19.827,23.979 20.348,24.973 20.348,26.493 20.348,28.67 20.328,30.427 20.328,30.961 20.328,31.397 20.621,31.904 21.448,31.745 27.916,29.586 32.579,23.485 32.579,16.29 32.579,7.293 25.285,0 16.288,0"
+							  Fill="DarkGray" Stretch="Uniform"/>
+					</Button>
+				</StackPanel>
+				<StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+					<Button x:Name="Back" Content="Back" Width="84" Margin="0 0 12 0"/>
+					<Button x:Name="Next" Content="Next" Width="84"/>
+				</StackPanel>
+			</Grid>
+		</Border>
+	</Grid>
+</UserControl>
