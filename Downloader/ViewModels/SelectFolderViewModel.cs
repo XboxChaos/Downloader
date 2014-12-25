@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using Caliburn.Micro;
+using Ookii.Dialogs.Wpf;
 
 namespace Downloader.ViewModels
 {
@@ -35,7 +36,14 @@ namespace Downloader.ViewModels
 
 		public void Browse()
 		{
-			// TODO: Implement
+			var browser = new VistaFolderBrowserDialog()
+			{
+				ShowNewFolderButton = true,
+				SelectedPath = InstallPath
+			};
+			var result = browser.ShowDialog();
+			if (result.HasValue && (bool) result)
+				InstallPath = browser.SelectedPath;
 		}
 	}
 }

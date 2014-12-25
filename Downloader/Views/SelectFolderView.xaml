@@ -7,9 +7,9 @@
              d:DesignWidth="636" d:DesignHeight="264">
 	<Grid Margin="12">
 		<DockPanel>
-			<TextBlock DockPanel.Dock="Top">What folder would you like to download Assembly to?</TextBlock>
+			<TextBlock DockPanel.Dock="Top">What folder would you like to install Assembly to?</TextBlock>
 			<DockPanel DockPanel.Dock="Bottom" VerticalAlignment="Top" Margin="0 12 0 0">
-				<Button DockPanel.Dock="Right" Content="Browse..." Width="84" Height="24" Margin="12 0 0 0"/>
+				<Button DockPanel.Dock="Right" x:Name="Browse" Content="Browse..." Width="84" Height="24" Margin="12 0 0 0"/>
 				<TextBox DockPanel.Dock="Left" x:Name="InstallPath" Height="24" VerticalContentAlignment="Center"></TextBox>
 			</DockPanel>
 		</DockPanel>

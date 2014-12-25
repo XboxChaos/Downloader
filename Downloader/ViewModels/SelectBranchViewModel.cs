@@ -22,6 +22,7 @@ namespace Downloader.ViewModels
 				new AvailableBranch() { Name = "master (Recommended)", LatestVersion = "2014.12.34.56.78.90-master"},
 				new AvailableBranch() { Name = "dev", LatestVersion = "2014.12.34.56.78.90-dev"},
 			};
+			SelectedBranch = Branches[0];
 		}
 
 		public AvailableBranch SelectedBranch
