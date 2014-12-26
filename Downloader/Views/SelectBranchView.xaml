@@ -14,7 +14,7 @@
 			<ListView.ItemTemplate>
 				<DataTemplate>
 					<StackPanel>
-						<TextBlock Text="{Binding Name}" FontWeight="Bold"/>
+						<TextBlock FontWeight="Bold"><Run Text="{Binding Name}"/> <Run Text="{Binding Description}"/></TextBlock>
 						<TextBlock Text="{Binding LatestVersion}" Foreground="Gray"/>
 					</StackPanel>
 				</DataTemplate>

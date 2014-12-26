@@ -19,13 +19,13 @@ namespace Downloader.ViewModels
 		private bool _canBack;
 
 		[ImportingConstructor]
-		public AppViewModel()
+		public AppViewModel(InstallSettings settings)
 		{
 			base.DisplayName = "Xbox Chaos Downloader";
 			_screens = new Screen[]
 			{
-				new SelectBranchViewModel(this),
- 				new SelectFolderViewModel(this), 
+				new SelectBranchViewModel(this, settings),
+ 				new SelectFolderViewModel(this, settings), 
 			};
 			base.ActivateItem(_screens[0]);
 		}
