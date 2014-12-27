@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using XboxChaos.Models;
 
 namespace Downloader.ViewModels
 {
@@ -20,6 +21,11 @@ namespace Downloader.ViewModels
 			BranchName = "master"; // Default to the master branch
 			InstallFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location); // Default to the assembly directory
 		}
+
+		/// <summary>
+		/// Gets or sets the application info to use.
+		/// </summary>
+		public ApplicationResponse ApplicationInfo { get; set; }
 
 		/// <summary>
 		/// Gets or sets the name of the branch that should be installed.
