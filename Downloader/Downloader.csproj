@@ -73,6 +73,8 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="AppBootstrapper.cs" />
+    <Compile Include="SizeUtil.cs" />
+    <Compile Include="ViewModels\DownloadViewModel.cs" />
     <Compile Include="ViewModels\InstallSettings.cs" />
     <Compile Include="ViewModels\AppViewModel.cs" />
     <Compile Include="ViewModels\IShell.cs" />
@@ -80,6 +82,9 @@
     <Compile Include="ViewModels\SelectFolderViewModel.cs" />
     <Compile Include="Views\AppView.xaml.cs">
       <DependentUpon>AppView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\DownloadView.xaml.cs">
+      <DependentUpon>DownloadView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\SelectBranchView.xaml.cs">
       <DependentUpon>SelectBranchView.xaml</DependentUpon>
@@ -119,6 +124,10 @@
   <ItemGroup />
   <ItemGroup>
     <Page Include="Views\AppView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\DownloadView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

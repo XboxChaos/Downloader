@@ -17,6 +17,7 @@ namespace Downloader.ViewModels
 
 		private bool _canNext;
 		private bool _canBack;
+		private bool _canNavigate = true;
 
 		[ImportingConstructor]
 		public AppViewModel(InstallSettings settings)
@@ -26,8 +27,19 @@ namespace Downloader.ViewModels
 			{
 				new SelectBranchViewModel(this, settings),
  				new SelectFolderViewModel(this, settings), 
+				new DownloadViewModel(this, settings), 
 			};
 			base.ActivateItem(_screens[0]);
+		}
+
+		public bool CanNavigate
+		{
+			get { return _canNavigate; }
+			set
+			{
+				_canNavigate = value;
+				NotifyOfPropertyChange(() => CanNavigate);
+			}
 		}
 
 		public bool CanGoBack

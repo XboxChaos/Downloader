@@ -54,7 +54,7 @@
 							  Fill="DarkGray" Stretch="Uniform"/>
 					</Button>
 				</StackPanel>
-				<StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+				<StackPanel Grid.Column="1" x:Name="CanNavigate" Orientation="Horizontal" HorizontalAlignment="Right">
 					<Button x:Name="GoBack" Content="Back" Width="84" Margin="0 0 12 0"/>
 					<Button x:Name="GoForward" Content="{Binding ForwardText}" Width="84"/>
 				</StackPanel>

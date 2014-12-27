@@ -1,0 +1,15 @@
+﻿<UserControl x:Class="Downloader.Views.DownloadView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignWidth="636" d:DesignHeight="264">
+	<StackPanel Margin="12">
+		<TextBlock DockPanel.Dock="Top">Downloading <Run Text="{Binding ApplicationName}"/>...</TextBlock>
+		<ProgressBar VerticalAlignment="Top" Height="24" Margin="0 12 0 0" Minimum="0" Maximum="100" Value="{Binding PercentComplete}"/>
+		<Grid x:Name="DisplayProgress">
+			<TextBlock Margin="0 12 0 0"><Run FontWeight="Bold" Text="{Binding PercentComplete}"/><Run FontWeight="Bold">% complete</Run> (<Run Text="{Binding DownloadedSize}"/> / <Run Text="{Binding TotalSize}"/>, <Run Text="{Binding DownloadSpeed}"/>)</TextBlock>
+		</Grid>
+	</StackPanel>
+</UserControl>
