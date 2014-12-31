@@ -77,10 +77,13 @@ namespace Downloader.ViewModels
 		{
 			_currentScreen++;
 			CanGoBack = (_currentScreen > 0);
-			if (_currentScreen < _screens.Length)
-				ActivateItem(_screens[_currentScreen]);
-			else
+			if (_currentScreen >= _screens.Length)
+			{
+				// Close after the last screen
 				TryClose();
+				return;
+			}
+			ActivateItem(_screens[_currentScreen]);
 			NotifyOfPropertyChange(() => ForwardText);
 		}
 

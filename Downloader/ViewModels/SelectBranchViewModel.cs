@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using Caliburn.Micro;
 using XboxChaos;
+using XboxChaos.Models;
 
 namespace Downloader.ViewModels
 {
@@ -69,27 +70,76 @@ namespace Downloader.ViewModels
 
 		protected override async void OnInitialize()
 		{
-			await LoadApplicationInfo();
+			await Load();
 			base.OnInitialize();
 		}
 
-		private async Task LoadApplicationInfo()
+		private async Task Load()
 		{
 			ShowProgressBar = true;
 			StatusText = "Connecting to the server...";
-			var response = await XboxChaosApi.GetApplicationInfoAsync("Assembly"); // TODO: Retrieve the application name from configuration file
-			if (response.Error != null)
+
+			_settings.ApplicationInfo = await LoadApplicationInfo();
+			if (_settings.ApplicationInfo == null)
 			{
-				MessageBox.Show(
-					"Unable to communicate with the server (" + response.Error.StatusCode + ", " + (int)response.Error.StatusCode + "):\r\n\r\n" +
-					response.Error.Description, "Xbox Chaos Downloader", MessageBoxButton.OK, MessageBoxImage.Error);
 				_shell.TryClose();
 				return;
 			}
-			_settings.ApplicationInfo = response.Result;
 			LoadBranches();
+
 			ShowProgressBar = false;
 			StatusText = "Please select the branch you wish to download:";
+		}
+
+		private static async Task<ApplicationResponse> LoadApplicationInfo()
+		{
+#if !OFFLINE
+			var response = await XboxChaosApi.GetApplicationInfoAsync("Assembly"); // TODO: Retrieve the application name from configuration file
+			if (response.Error == null)
+				return response.Result;
+			MessageBox.Show(
+				"Unable to communicate with the server (" + response.Error.StatusCode + ", " + (int)response.Error.StatusCode + "):\r\n\r\n" +
+				response.Error.Description, "Xbox Chaos Downloader", MessageBoxButton.OK, MessageBoxImage.Error);
+			return null;
+#else
+			return GetTestResponse();
+#endif
+		}
+
+		private static ApplicationResponse GetTestResponse()
+		{
+			return new ApplicationResponse()
+			{
+				Name = "Assembly",
+				Description = "Multi-Generation Blam Engine Research Tool",
+				RepoUrl = "https://github.com/XboxChaos/Assembly",
+				RepoName = "Assembly",
+				ApplicationBranches = new ApplicationBranchResponse[]
+				{
+					new ApplicationBranchResponse()
+					{
+						Name = "master",
+						Ref = "master",
+						RepoTree = "master",
+						BuildDownload = "http://mirror.internode.on.net/pub/test/10meg.test",
+						UpdaterDownload = "http://mirror.internode.on.net/pub/test/1meg.test",
+						FriendlyVersion = "2014.12.34.56.78.90-master",
+						InternalVersion = "2.0.0.0",
+						Changelog = "Test changelog",
+					},
+					new ApplicationBranchResponse()
+					{
+						Name = "dev",
+						Ref = "dev",
+						RepoTree = "dev",
+						BuildDownload = "http://mirror.internode.on.net/pub/test/10meg.test",
+						UpdaterDownload = "http://mirror.internode.on.net/pub/test/1meg.test",
+						FriendlyVersion = "2014.12.34.56.78.90-dev",
+						InternalVersion = "2.0.0.0",
+						Changelog = "Test changelog",
+					},
+				},
+			};
 		}
 
 		private void LoadBranches()

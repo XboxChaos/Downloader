@@ -18,13 +18,13 @@ namespace Downloader.ViewModels
 		private readonly IShell _shell;
 		private readonly InstallSettings _settings;
 
-		private WebClient _client;                  // WebClient to use
-		private string _outPath;                    // Path to download the file to
-		private DateTime _lastTime;                 // The last time a progress update occurred
-		private long _lastSize;                     // The last file size recorded
-		private volatile bool _done;                // True if downloading has stopped
-		private volatile bool _waitingForUser;      // True if a modal dialog is waiting for user input
-		private Action<bool> _pendingCloseCallback; // If the user wants to close, this is the callback to execute
+		private readonly WebClient _client = new WebClient(); // WebClient to use
+		private DateTime _lastTime;                           // The last time a progress update occurred
+		private long _lastSize;                               // The last file size recorded
+		private bool _done;                                   // True if downloading is complete
+		private bool _waitingForUser;                         // True if a modal dialog is waiting for user input
+		private DownloadRequest[] _downloadQueue;             // The files that need to be downloaded
+		private int _currentDownload = 0;                     // Index of the current file being downloaded
 
 		private string _applicationName;
 		private int _percentComplete;
@@ -38,21 +38,16 @@ namespace Downloader.ViewModels
 		{
 			_shell = shell;
 			_settings = settings;
+
+			_client.DownloadProgressChanged += OnDownloadProgressChanged;
+			_client.DownloadFileCompleted += OnDownloadFileCompleted;
 		}
 
 		protected override void OnActivate()
 		{
 			_shell.CanNavigate = false;
-			ApplicationName = "Assembly";
-			DownloadSpeed = "0 B/s";
-			_outPath = Path.GetTempFileName();
-			_lastSize = 0;
-			_lastTime = DateTime.Now;
-
-			_client = new WebClient();
-			_client.DownloadProgressChanged += OnDownloadProgressChanged;
-			_client.DownloadFileCompleted += OnDownloadFileCompleted;
-			_client.DownloadFileAsync(new Uri("http://mirror.internode.on.net/pub/test/100meg.test"), _outPath); // 100 MB test file for now
+			QueueDownloads();
+			BeginDownload();
 			base.OnActivate();
 		}
 
@@ -60,8 +55,11 @@ namespace Downloader.ViewModels
 		{
 			/*if (PercentComplete != 100)
 				return;*/
-			if (File.Exists(_outPath))
-				File.Delete(_outPath);
+			foreach (var download in _downloadQueue)
+			{
+				if (File.Exists(download.ResultPath))
+					File.Delete(download.ResultPath);
+			}
 		}
 
 		public override void CanClose(Action<bool> callback)
@@ -77,41 +75,51 @@ namespace Downloader.ViewModels
 			var result = MessageBox.Show("A file download is currently in progress.\r\nAre you sure you want to cancel it?",
 				"Xbox Chaos Downloader", MessageBoxButton.YesNo, MessageBoxImage.Question);
 			_waitingForUser = false;
-			if (_done || result == MessageBoxResult.No)
+			if (result == MessageBoxResult.Yes)
 			{
+				// User wants to close - close if the download has already completed, or cancel the download otherwise
 				callback(_done);
+				_client.CancelAsync();
 				return;
 			}
 
-			// Store the callback and wait for the WebClient to cancel
-			_pendingCloseCallback = callback;
-			_client.CancelAsync();
+			// User doesn't want to close - signal that we're finished if the download has already completed
+			callback(false);
+			if (_done)
+				Finished();
 		}
 
 		private void OnDownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
 		{
-			_done = true;
-			if (e.Error == null && !e.Cancelled)
+			if (e.Cancelled)
 			{
-				// Download succeeded
-				DownloadedSize = TotalSize;
-				PercentComplete = 100;
-
-				// If we're not waiting for the user to do anything, then try to close
-				if (!_waitingForUser)
-					_shell.TryClose();
+				// A cancelled download indicates that the user wants to quit
+				_done = true;
+				_shell.TryClose();
 				return;
 			}
-			if (!e.Cancelled)
+			if (e.Error != null)
 			{
 				MessageBox.Show("An error occurred while attempting to download " + ApplicationName + ":\r\n\r\n" + e.Error,
 					"Xbox Chaos Downloader", MessageBoxButton.OK, MessageBoxImage.Error);
+				_done = true;
 				_shell.TryClose();
+				return;
 			}
 
-			// If the user requested to quit, then run the pending callback
-			if (_pendingCloseCallback != null)
-				_pendingCloseCallback(true);
+			// Download succeeded
+			DownloadedSize = TotalSize;
+			PercentComplete = 100;
+			_currentDownload++;
+			NotifyOfPropertyChange(() => CurrentFileNumber);
+			if (_currentDownload == _downloadQueue.Length)
+			{
+				_done = true;
+				if (!_waitingForUser)
+					Finished(); // Signal that we're finished if we're not waiting for user input
+				return;
+			}
+			BeginDownload();
 		}
 
 		private void OnDownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
@@ -134,6 +142,71 @@ namespace Downloader.ViewModels
 			}
 
 			DisplayProgress = true;
+		}
+
+		/// <summary>
+		/// Builds the download queue based off of information for the current branch.
+		/// </summary>
+		private void QueueDownloads()
+		{
+			var branch = _settings.ApplicationInfo.ApplicationBranches.FirstOrDefault(b => b.Name == _settings.BranchName);
+			if (branch == null)
+			{
+				MessageBox.Show("Unable to find the branch to download!", "Xbox Chaos Downloader", MessageBoxButton.OK,
+					MessageBoxImage.Error);
+				TryClose();
+				return;
+			}
+			if (string.IsNullOrEmpty(branch.BuildDownload) || string.IsNullOrEmpty(branch.UpdaterDownload))
+			{
+				MessageBox.Show("The branch has invalid download links!", "Xbox Chaos Downloader", MessageBoxButton.OK,
+					MessageBoxImage.Error);
+				TryClose();
+				return;
+			}
+
+			// Create two queued downloads for the branch - one for the actual program, and one for the updater
+			_downloadQueue = new[]
+			{
+				// Download for the actual program
+				new DownloadRequest()
+				{
+					DisplayName = _settings.ApplicationInfo.Name,
+					Url = branch.BuildDownload,
+					ResultPath = Path.GetTempFileName(),
+				},
+
+				// Download for the updater
+				new DownloadRequest()
+				{
+					DisplayName = "updater",
+					Url = branch.UpdaterDownload,
+					ResultPath = Path.GetTempFileName(),
+				},
+			};
+			NotifyOfPropertyChange(() => TotalFiles);
+		}
+
+		/// <summary>
+		/// Begins downloading the current file.
+		/// </summary>
+		private void BeginDownload()
+		{
+			var download = _downloadQueue[_currentDownload];
+			ApplicationName = download.DisplayName;
+			DownloadSpeed = "0 B/s";
+			_lastSize = 0;
+			_lastTime = DateTime.Now;
+			_client.DownloadFileAsync(new Uri(download.Url), download.ResultPath);
+		}
+
+		/// <summary>
+		/// Moves to the next step.
+		/// </summary>
+		private void Finished()
+		{
+			_shell.CanNavigate = true;
+			_shell.GoForward();
 		}
 
 		/// <summary>
@@ -213,5 +286,42 @@ namespace Downloader.ViewModels
 				NotifyOfPropertyChange(() => DisplayProgress);
 			}
 		}
+
+		/// <summary>
+		/// Gets the number of the file currently being downloaded, starting from 1.
+		/// </summary>
+		public int CurrentFileNumber
+		{
+			get { return _currentDownload + 1; }
+		}
+
+		/// <summary>
+		/// Gets or the total number of files to be downloaded.
+		/// </summary>
+		public int TotalFiles
+		{
+			get { return _downloadQueue.Length; }
+		}
+	}
+
+	/// <summary>
+	/// A file that needs to be downloaded.
+	/// </summary>
+	class DownloadRequest
+	{
+		/// <summary>
+		/// Gets or sets the name to display for the download.
+		/// </summary>
+		public string DisplayName { get; set; }
+
+		/// <summary>
+		/// Gets or sets the URL of the file to download.
+		/// </summary>
+		public string Url { get; set; }
+
+		/// <summary>
+		/// Gets or sets the path of the resulting file.
+		/// </summary>
+		public string ResultPath { get; set; }
 	}
 }

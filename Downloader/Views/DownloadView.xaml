@@ -6,7 +6,7 @@
              mc:Ignorable="d" 
              d:DesignWidth="636" d:DesignHeight="264">
 	<StackPanel Margin="12">
-		<TextBlock DockPanel.Dock="Top">Downloading <Run Text="{Binding ApplicationName}"/>...</TextBlock>
+		<TextBlock DockPanel.Dock="Top">Downloading <Run Text="{Binding ApplicationName}"/> (<Run Text="{Binding CurrentFileNumber, Mode=OneWay}"/>/<Run Text="{Binding TotalFiles, Mode=OneWay}"/>)...</TextBlock>
 		<ProgressBar VerticalAlignment="Top" Height="24" Margin="0 12 0 0" Minimum="0" Maximum="100" Value="{Binding PercentComplete}"/>
 		<Grid x:Name="DisplayProgress">
 			<TextBlock Margin="0 12 0 0"><Run FontWeight="Bold" Text="{Binding PercentComplete}"/><Run FontWeight="Bold">% complete</Run> (<Run Text="{Binding DownloadedSize}"/> / <Run Text="{Binding TotalSize}"/>, <Run Text="{Binding DownloadSpeed}"/>)</TextBlock>
