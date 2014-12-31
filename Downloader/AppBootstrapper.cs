@@ -49,8 +49,9 @@ namespace Downloader
 			var contract = string.IsNullOrEmpty(key) ? AttributedModelServices.GetContractName(serviceType) : key;
 			var exports = _container.GetExportedValues<object>(contract);
 
-			if (exports.Any())
-				return exports.First();
+			var export = exports.FirstOrDefault();
+			if (export != null)
+				return export;
 
 			throw new Exception(string.Format("Could not locate any instances of contract {0}.", contract));
 		}

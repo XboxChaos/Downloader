@@ -9,21 +9,16 @@
 			<RowDefinition Height="Auto"/>
 			<RowDefinition Height="*"/>
 		</Grid.RowDefinitions>
-		<TextBlock Grid.Row="0" x:Name="StatusText"/>
-		<Grid Grid.Row="1" Margin="0 12 0 0">
-			<ListView x:Name="Branches" SelectedItem="{Binding SelectedBranch}" ItemsSource="{Binding Branches}">
-				<ListView.ItemTemplate>
-					<DataTemplate>
-						<StackPanel>
-							<TextBlock FontWeight="Bold"><Run Text="{Binding Name}"/> <Run Text="{Binding Description}"/></TextBlock>
-							<TextBlock Text="{Binding LatestVersion}" Foreground="Gray" />
-						</StackPanel>
-					</DataTemplate>
-				</ListView.ItemTemplate>
-			</ListView>
-			<Grid x:Name="ShowProgressBar">
-				<ProgressBar IsIndeterminate="True" Height="24" VerticalAlignment="Top"/>
-			</Grid>
-		</Grid>
+		<TextBlock Grid.Row="0">Please select the branch you wish to download:</TextBlock>
+		<ListView Grid.Row="1" x:Name="Branches" SelectedItem="{Binding SelectedBranch}" ItemsSource="{Binding Branches}" Margin="0 12 0 0">
+			<ListView.ItemTemplate>
+				<DataTemplate>
+					<StackPanel>
+						<TextBlock FontWeight="Bold"><Run Text="{Binding Name}"/> <Run Text="{Binding Description}"/></TextBlock>
+						<TextBlock Text="{Binding LatestVersion}" Foreground="Gray" />
+					</StackPanel>
+				</DataTemplate>
+			</ListView.ItemTemplate>
+		</ListView>
 	</Grid>
 </UserControl>

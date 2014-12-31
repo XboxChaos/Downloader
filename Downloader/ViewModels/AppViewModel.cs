@@ -2,104 +2,93 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using Caliburn.Micro;
-using XboxChaos;
+using Newtonsoft.Json;
 
 namespace Downloader.ViewModels
 {
 	[Export(typeof(IShell))]
-	class AppViewModel : Conductor<object>.Collection.OneActive, IShell
+	class AppViewModel : Conductor<object>, IShell
 	{
-		private readonly Screen[] _screens;
-		private int _currentScreen;
+		private const string SettingsFile = "app.json";
 
-		private bool _canNext;
-		private bool _canBack;
-		private bool _canNavigate = true;
+		private readonly InstallSettings _installSettings;
+		private ApplicationSettings _applicationSettings;
+		private NavigationViewModel _navigation;
 
 		[ImportingConstructor]
 		public AppViewModel(InstallSettings settings)
 		{
-			base.DisplayName = "Xbox Chaos Downloader";
-			_screens = new Screen[]
+			_installSettings = settings;
+		}
+
+		protected override void OnInitialize()
+		{
+			DisplayName = "Xbox Chaos Downloader";
+			try
 			{
-				new SelectBranchViewModel(this, settings),
- 				new SelectFolderViewModel(this, settings), 
-				new DownloadViewModel(this, settings), 
-			};
-			base.ActivateItem(_screens[0]);
+				_applicationSettings = LoadSettings();
+				_installSettings.BranchName = _applicationSettings.DefaultBranch;
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show("Failed to read settings from " + SettingsFile + ":\n\n" + ex.Message, DisplayName,
+					MessageBoxButton.OK, MessageBoxImage.Error);
+				Application.Current.Shutdown();
+				return;
+			}
+			ActivateItem(new ConnectViewModel(this, _applicationSettings, _installSettings));
+		}
+
+		/// <summary>
+		/// Loads the settings file.
+		/// </summary>
+		/// <returns>The settings that were loaded.</returns>
+		private static ApplicationSettings LoadSettings()
+		{
+			var assemblyDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? "";
+			var settingsPath = Path.Combine(assemblyDir, SettingsFile);
+			var json = File.ReadAllText(settingsPath);
+			return JsonConvert.DeserializeObject<ApplicationSettings>(json);
 		}
 
 		public bool CanNavigate
 		{
-			get { return _canNavigate; }
+			get { return (_navigation != null) && _navigation.CanNavigate; }
 			set
 			{
-				_canNavigate = value;
-				NotifyOfPropertyChange(() => CanNavigate);
+				if (_navigation != null)
+					_navigation.CanNavigate = value;
 			}
-		}
-
-		public bool CanGoBack
-		{
-			get { return _canBack; }
-			set
-			{
-				_canBack = value;
-				NotifyOfPropertyChange(() => CanGoBack);
-			}
-		}
-
-		public void GoBack()
-		{
-			if (_currentScreen <= 0)
-				return;
-			_currentScreen--;
-			CanGoBack = (_currentScreen > 0);
-			ActivateItem(_screens[_currentScreen]);
-			NotifyOfPropertyChange(() => ForwardText);
 		}
 
 		public bool CanGoForward
 		{
-			get { return _canNext; }
+			get { return (_navigation != null) && _navigation.CanGoForward; }
 			set
 			{
-				_canNext = value;
-				NotifyOfPropertyChange(() => CanGoForward);
+				if (_navigation != null)
+					_navigation.CanGoForward = value;
 			}
 		}
 
 		public void GoForward()
 		{
-			_currentScreen++;
-			CanGoBack = (_currentScreen > 0);
-			if (_currentScreen >= _screens.Length)
+			if (_navigation != null)
 			{
-				// Close after the last screen
-				TryClose();
-				return;
+				_navigation.GoForward();
 			}
-			ActivateItem(_screens[_currentScreen]);
-			NotifyOfPropertyChange(() => ForwardText);
-		}
-
-		public string ForwardText
-		{
-			get { return (_currentScreen < _screens.Length - 1) ? "Next" : "Finish"; }
-		}
-
-		public void XboxChaos()
-		{
-			Process.Start("http://www.xboxchaos.com/");
-		}
-
-		public void GitHub()
-		{
-			Process.Start("https://www.github.com/XboxChaos");
+			else
+			{
+				_navigation = new NavigationViewModel(this, _applicationSettings, _installSettings);
+				ActivateItem(_navigation);
+			}
 		}
 	}
 }

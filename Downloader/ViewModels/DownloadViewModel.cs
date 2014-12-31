@@ -16,7 +16,8 @@ namespace Downloader.ViewModels
 		private const double UpdateInterval = 0.5;
 
 		private readonly IShell _shell;
-		private readonly InstallSettings _settings;
+		private readonly ApplicationSettings _applicationSettings;
+		private readonly InstallSettings _installSettings;
 
 		private readonly WebClient _client = new WebClient(); // WebClient to use
 		private DateTime _lastTime;                           // The last time a progress update occurred
@@ -34,10 +35,11 @@ namespace Downloader.ViewModels
 		private bool _displayProgress;
 
 		[ImportingConstructor]
-		public DownloadViewModel(IShell shell, InstallSettings settings)
+		public DownloadViewModel(IShell shell, ApplicationSettings applicationSettings, InstallSettings installSettings)
 		{
 			_shell = shell;
-			_settings = settings;
+			_applicationSettings = applicationSettings;
+			_installSettings = installSettings;
 
 			_client.DownloadProgressChanged += OnDownloadProgressChanged;
 			_client.DownloadFileCompleted += OnDownloadFileCompleted;
@@ -149,7 +151,7 @@ namespace Downloader.ViewModels
 		/// </summary>
 		private void QueueDownloads()
 		{
-			var branch = _settings.ApplicationInfo.ApplicationBranches.FirstOrDefault(b => b.Name == _settings.BranchName);
+			var branch = _installSettings.ApplicationInfo.ApplicationBranches.FirstOrDefault(b => b.Name == _installSettings.BranchName);
 			if (branch == null)
 			{
 				MessageBox.Show("Unable to find the branch to download!", "Xbox Chaos Downloader", MessageBoxButton.OK,
@@ -171,7 +173,7 @@ namespace Downloader.ViewModels
 				// Download for the actual program
 				new DownloadRequest()
 				{
-					DisplayName = _settings.ApplicationInfo.Name,
+					DisplayName = _installSettings.ApplicationInfo.Name,
 					Url = branch.BuildDownload,
 					ResultPath = Path.GetTempFileName(),
 				},

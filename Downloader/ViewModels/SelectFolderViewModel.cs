@@ -15,23 +15,30 @@ namespace Downloader.ViewModels
 	class SelectFolderViewModel : Screen
 	{
 		private readonly IShell _shell;
-		private readonly InstallSettings _settings;
+		private readonly ApplicationSettings _applicationSettings;
+		private readonly InstallSettings _installSettings;
 
 		[ImportingConstructor]
-		public SelectFolderViewModel(IShell shell, InstallSettings settings)
+		public SelectFolderViewModel(IShell shell, ApplicationSettings applicationSettings, InstallSettings installSettings)
 		{
 			_shell = shell;
-			_settings = settings;
+			_applicationSettings = applicationSettings;
+			_installSettings = installSettings;
 		}
 
 		public string InstallPath
 		{
-			get { return _settings.InstallFolder; }
+			get { return _installSettings.InstallFolder; }
 			set
 			{
-				_settings.InstallFolder = value;
+				_installSettings.InstallFolder = value;
 				NotifyOfPropertyChange(() => InstallPath);
 			}
+		}
+
+		public string ApplicationName
+		{
+			get { return _installSettings.ApplicationInfo.Name; }
 		}
 
 		public void Browse()
