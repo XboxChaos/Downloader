@@ -25,7 +25,7 @@ namespace Downloader.ViewModels
 		private bool _done;                                   // True if downloading is complete
 		private bool _waitingForUser;                         // True if a modal dialog is waiting for user input
 		private List<DownloadRequest> _downloadQueue;         // The files that need to be downloaded
-		private int _currentDownload = 0;                     // Index of the current file being downloaded
+		private int _currentDownload;                         // Index of the current file being downloaded
 
 		private string _applicationName;
 		private int _percentComplete;
@@ -50,18 +50,19 @@ namespace Downloader.ViewModels
 			_shell.CanNavigate = false;
 			QueueDownloads();
 			BeginDownload();
-			base.OnActivate();
 		}
 
 		protected override void OnDeactivate(bool close)
 		{
-			/*if (PercentComplete != 100)
+			/*if (!close)
 				return;*/
-			foreach (var download in _downloadQueue)
+
+			// Closing - delete the files that were downloaded
+			/*foreach (var download in _downloadQueue)
 			{
 				if (File.Exists(download.ResultPath))
 					File.Delete(download.ResultPath);
-			}
+			}*/
 		}
 
 		public override void CanClose(Action<bool> callback)
@@ -172,13 +173,14 @@ namespace Downloader.ViewModels
 			}
 
 			// Queue a download for the actual program
+			_installSettings.ApplicationZipPath = Path.GetTempFileName();
 			_downloadQueue = new List<DownloadRequest>()
 			{
 				new DownloadRequest()
 				{
 					DisplayName = _installSettings.ApplicationInfo.Name,
 					Url = branch.BuildDownload,
-					ResultPath = Path.GetTempFileName(),
+					ResultPath = _installSettings.ApplicationZipPath,
 				}
 			};
 			if (_applicationSettings.Update)

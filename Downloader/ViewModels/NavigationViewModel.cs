@@ -37,6 +37,7 @@ namespace Downloader.ViewModels
 				new SelectBranchViewModel(shell, applicationSettings, installSettings),
  				new SelectFolderViewModel(shell, applicationSettings, installSettings), 
 				new DownloadViewModel(shell, applicationSettings, installSettings), 
+				new ExtractViewModel(shell, _applicationSettings, installSettings), 
 			};
 			base.ActivateItem(_screens[0]);
 		}

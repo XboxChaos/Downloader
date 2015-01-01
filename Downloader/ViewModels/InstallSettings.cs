@@ -36,5 +36,10 @@ namespace Downloader.ViewModels
 		/// Gets or sets the path to the folder that the application should be installed to.
 		/// </summary>
 		public string InstallFolder { get; set; }
+
+		/// <summary>
+		/// Gets or sets the path to the application's zip file after it has been downloaded.
+		/// </summary>
+		public string ApplicationZipPath { get; set; }
 	}
 }
