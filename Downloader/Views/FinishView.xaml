@@ -1,0 +1,12 @@
+﻿<UserControl x:Class="Downloader.Views.FinishView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignWidth="636" d:DesignHeight="264">
+    <StackPanel Margin="12">
+		<TextBlock><Run Text="{Binding ApplicationName, Mode=OneWay}"/> version <Run Text="{Binding ApplicationVersion, Mode=OneWay}"/> has been downloaded successfully!<LineBreak/>Files were extracted to <Run Text="{Binding ExtractionPath, Mode=OneWay}"/>.</TextBlock>
+		<CheckBox x:Name="RunOnClose" Margin="0 24 0 0"><TextBlock>Run <Run Text="{Binding ApplicationName, Mode=OneWay}"/> when I close this window</TextBlock></CheckBox>
+	</StackPanel>
+</UserControl>

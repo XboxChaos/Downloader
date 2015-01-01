@@ -88,6 +88,7 @@
     <Compile Include="ViewModels\ConnectViewModel.cs" />
     <Compile Include="ViewModels\DownloadViewModel.cs" />
     <Compile Include="ViewModels\ExtractViewModel.cs" />
+    <Compile Include="ViewModels\FinishViewModel.cs" />
     <Compile Include="ViewModels\InstallSettings.cs" />
     <Compile Include="ViewModels\AppViewModel.cs" />
     <Compile Include="ViewModels\IShell.cs" />
@@ -102,6 +103,9 @@
     </Compile>
     <Compile Include="Views\ExtractView.xaml.cs">
       <DependentUpon>ExtractView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\FinishView.xaml.cs">
+      <DependentUpon>FinishView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\NavigationView.xaml.cs">
       <DependentUpon>NavigationView.xaml</DependentUpon>
@@ -155,6 +159,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\ExtractView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\FinishView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

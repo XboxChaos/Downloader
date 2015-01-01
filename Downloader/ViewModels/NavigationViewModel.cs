@@ -37,7 +37,8 @@ namespace Downloader.ViewModels
 				new SelectBranchViewModel(shell, applicationSettings, installSettings),
  				new SelectFolderViewModel(shell, applicationSettings, installSettings), 
 				new DownloadViewModel(shell, applicationSettings, installSettings), 
-				new ExtractViewModel(shell, _applicationSettings, installSettings), 
+				new ExtractViewModel(shell, applicationSettings, installSettings), 
+				new FinishViewModel(shell, applicationSettings, installSettings), 
 			};
 			base.ActivateItem(_screens[0]);
 		}
@@ -95,7 +96,7 @@ namespace Downloader.ViewModels
 		public void GoForward()
 		{
 			_currentScreen++;
-			CanGoBack = (_currentScreen > 0);
+			CanGoBack = (_currentScreen > 0 && !(_screens[_currentScreen - 1] is ExtractViewModel)); // TODO: fix hax
 			if (_currentScreen >= _screens.Length)
 			{
 				// Close after the last screen
