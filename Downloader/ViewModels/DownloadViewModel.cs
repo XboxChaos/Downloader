@@ -24,7 +24,7 @@ namespace Downloader.ViewModels
 		private long _lastSize;                               // The last file size recorded
 		private bool _done;                                   // True if downloading is complete
 		private bool _waitingForUser;                         // True if a modal dialog is waiting for user input
-		private DownloadRequest[] _downloadQueue;             // The files that need to be downloaded
+		private List<DownloadRequest> _downloadQueue;         // The files that need to be downloaded
 		private int _currentDownload = 0;                     // Index of the current file being downloaded
 
 		private string _applicationName;
@@ -109,18 +109,22 @@ namespace Downloader.ViewModels
 				return;
 			}
 
-			// Download succeeded
+			// Download succeeded - show 100% completion in the UI
 			DownloadedSize = TotalSize;
 			PercentComplete = 100;
-			_currentDownload++;
-			NotifyOfPropertyChange(() => CurrentFileNumber);
-			if (_currentDownload == _downloadQueue.Length)
+
+			// Check if this was the last download
+			if (_currentDownload == _downloadQueue.Count - 1)
 			{
 				_done = true;
 				if (!_waitingForUser)
 					Finished(); // Signal that we're finished if we're not waiting for user input
 				return;
 			}
+
+			// Move to the next download
+			_currentDownload++;
+			NotifyOfPropertyChange(() => CurrentFileNumber);
 			BeginDownload();
 		}
 
@@ -167,24 +171,25 @@ namespace Downloader.ViewModels
 				return;
 			}
 
-			// Create two queued downloads for the branch - one for the actual program, and one for the updater
-			_downloadQueue = new[]
+			// Queue a download for the actual program
+			_downloadQueue = new List<DownloadRequest>()
 			{
-				// Download for the actual program
 				new DownloadRequest()
 				{
 					DisplayName = _installSettings.ApplicationInfo.Name,
 					Url = branch.BuildDownload,
 					ResultPath = Path.GetTempFileName(),
-				},
-
-				// Download for the updater
-				new DownloadRequest()
+				}
+			};
+			if (_applicationSettings.Update)
+			{
+				// Queue a download for the updater if update mode is active
+				_downloadQueue.Add(new DownloadRequest()
 				{
 					DisplayName = "updater",
 					Url = branch.UpdaterDownload,
 					ResultPath = Path.GetTempFileName(),
-				},
+				});
 			};
 			NotifyOfPropertyChange(() => TotalFiles);
 		}
@@ -302,7 +307,7 @@ namespace Downloader.ViewModels
 		/// </summary>
 		public int TotalFiles
 		{
-			get { return _downloadQueue.Length; }
+			get { return _downloadQueue.Count; }
 		}
 	}
 
