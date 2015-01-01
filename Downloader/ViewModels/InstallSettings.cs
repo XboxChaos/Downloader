@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
@@ -20,6 +21,7 @@ namespace Downloader.ViewModels
 		{
 			BranchName = "master"; // Default to the master branch
 			InstallFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location); // Default to the assembly directory
+			TemporaryFiles = new TempFileCollection();
 		}
 
 		/// <summary>
@@ -41,5 +43,10 @@ namespace Downloader.ViewModels
 		/// Gets or sets the path to the application's zip file after it has been downloaded.
 		/// </summary>
 		public string ApplicationZipPath { get; set; }
+
+		/// <summary>
+		/// Gets or sets a collection of temporary files to keep track of.
+		/// </summary>
+		public TempFileCollection TemporaryFiles { get; set; }
 	}
 }

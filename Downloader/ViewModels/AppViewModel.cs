@@ -46,6 +46,11 @@ namespace Downloader.ViewModels
 			ActivateItem(new ConnectViewModel(this, _applicationSettings, _installSettings));
 		}
 
+		protected override void OnDeactivate(bool close)
+		{
+			_installSettings.TemporaryFiles.Delete();
+		}
+
 		/// <summary>
 		/// Loads the settings file.
 		/// </summary>

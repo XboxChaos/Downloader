@@ -52,19 +52,6 @@ namespace Downloader.ViewModels
 			BeginDownload();
 		}
 
-		protected override void OnDeactivate(bool close)
-		{
-			/*if (!close)
-				return;*/
-
-			// Closing - delete the files that were downloaded
-			/*foreach (var download in _downloadQueue)
-			{
-				if (File.Exists(download.ResultPath))
-					File.Delete(download.ResultPath);
-			}*/
-		}
-
 		public override void CanClose(Action<bool> callback)
 		{
 			if (_done)
@@ -173,7 +160,7 @@ namespace Downloader.ViewModels
 			}
 
 			// Queue a download for the actual program
-			_installSettings.ApplicationZipPath = Path.GetTempFileName();
+			_installSettings.ApplicationZipPath = _installSettings.TemporaryFiles.AddExtension(".zip");
 			_downloadQueue = new List<DownloadRequest>()
 			{
 				new DownloadRequest()
@@ -190,7 +177,7 @@ namespace Downloader.ViewModels
 				{
 					DisplayName = "updater",
 					Url = branch.UpdaterDownload,
-					ResultPath = Path.GetTempFileName(),
+					ResultPath = _installSettings.TemporaryFiles.AddExtension(".zip"),
 				});
 			};
 			NotifyOfPropertyChange(() => TotalFiles);

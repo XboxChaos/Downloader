@@ -42,6 +42,14 @@ namespace Downloader.ViewModels
 			_shell.GoForward();
 		}
 
+		protected override void OnDeactivate(bool close)
+		{
+			foreach (var archive in _archives)
+				archive.Dispose();
+			_archives.Clear();
+			_installSettings.TemporaryFiles.Delete();
+		}
+
 		private void QueueZips()
 		{
 			try
