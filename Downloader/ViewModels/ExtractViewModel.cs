@@ -60,16 +60,23 @@ namespace Downloader.ViewModels
 
 		protected override void OnDeactivate(bool close)
 		{
+			foreach (var archive in _archives)
+				archive.Dispose();
+			_archives.Clear();
+
 			if (!close)
 				_shell.CanNavigate = true;
+			else
+				_installSettings.TemporaryFiles.Delete();
 		}
 
 		private void QueueZips()
 		{
 			try
 			{
-				QueueZip(_installSettings.ApplicationZipPath);
-				// TODO: Queue update zip if update mode is active
+				// In updater mode, only unzip the updater, otherwise only unzip the application
+				// This is because the updater takes care of unzipping the application
+				QueueZip(_installSettings.UpdateZipPath ?? _installSettings.ApplicationZipPath);
 			}
 			catch (Exception ex)
 			{
@@ -97,12 +104,6 @@ namespace Downloader.ViewModels
 		private void WorkerOnRunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
 		{
 			_done = true;
-
-			foreach (var archive in _archives)
-				archive.Dispose();
-			_archives.Clear();
-			_installSettings.TemporaryFiles.Delete();
-
 			if (e.Cancelled)
 			{
 				_shell.Quit();
@@ -138,7 +139,8 @@ namespace Downloader.ViewModels
 					if (_worker.CancellationPending)
 						return;
 					CurrentFileName = entry.FullName;
-					var outPath = Path.Combine(_installSettings.InstallFolder, entry.FullName);
+					var outDir = _applicationSettings.Update ? Path.GetTempPath() : _installSettings.InstallFolder; // Unzip to the temp dir in update mode
+					var outPath = Path.Combine(outDir, entry.FullName);
 					if (outPath.EndsWith("\\") || outPath.EndsWith("/"))
 						Directory.CreateDirectory(outPath);
 					else

@@ -14,8 +14,6 @@ namespace Downloader.ViewModels
 		private readonly ApplicationSettings _applicationSettings;
 		private readonly InstallSettings _installSettings;
 
-		private bool _runOnClose = true;
-
 		[ImportingConstructor]
 		public FinishViewModel(IShell shell, ApplicationSettings applicationSettings, InstallSettings installSettings)
 		{
@@ -44,12 +42,17 @@ namespace Downloader.ViewModels
 			get { return _installSettings.InstallFolder; }
 		}
 
+		public bool CanRunOnClose
+		{
+			get { return !_applicationSettings.Update; }
+		}
+
 		public bool RunOnClose
 		{
-			get { return _runOnClose; }
+			get { return _installSettings.RunOnFinish || _applicationSettings.Update; }
 			set
 			{
-				_runOnClose = value;
+				_installSettings.RunOnFinish = value;
 				NotifyOfPropertyChange(() => RunOnClose);
 			}
 		}

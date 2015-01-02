@@ -7,6 +7,8 @@
              d:DesignWidth="636" d:DesignHeight="264">
     <StackPanel Margin="12">
 		<TextBlock><Run Text="{Binding ApplicationName, Mode=OneWay}"/> version <Run Text="{Binding ApplicationVersion, Mode=OneWay}"/> has been downloaded successfully!<LineBreak/>Files were extracted to <Run Text="{Binding ExtractionPath, Mode=OneWay}"/>.</TextBlock>
-		<CheckBox x:Name="RunOnClose" Margin="0 24 0 0"><TextBlock>Run <Run Text="{Binding ApplicationName, Mode=OneWay}"/> when I close this window</TextBlock></CheckBox>
+		<CheckBox x:Name="RunOnClose" Margin="0 24 0 0" IsEnabled="{Binding CanRunOnClose}">
+            <TextBlock>Run <Run Text="{Binding ApplicationName, Mode=OneWay}"/> when I close this window</TextBlock>
+        </CheckBox>
 	</StackPanel>
 </UserControl>

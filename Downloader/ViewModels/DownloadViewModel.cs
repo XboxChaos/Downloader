@@ -152,7 +152,8 @@ namespace Downloader.ViewModels
 			}
 
 			// Queue a download for the actual program
-			_installSettings.ApplicationZipPath = _installSettings.TemporaryFiles.AddExtension("zip");
+			_installSettings.ApplicationZipPath = Path.GetTempFileName();
+			_installSettings.TemporaryFiles.AddFile(_installSettings.ApplicationZipPath, false);
 			_downloadQueue = new List<DownloadRequest>()
 			{
 				new DownloadRequest()
@@ -165,11 +166,13 @@ namespace Downloader.ViewModels
 			if (_applicationSettings.Update)
 			{
 				// Queue a download for the updater if update mode is active
+				_installSettings.UpdateZipPath = Path.GetTempFileName();
+				_installSettings.TemporaryFiles.AddFile(_installSettings.UpdateZipPath, false);
 				_downloadQueue.Add(new DownloadRequest()
 				{
 					DisplayName = "updater",
 					Url = branch.UpdaterDownload,
-					ResultPath = _installSettings.TemporaryFiles.AddExtension("zip"),
+					ResultPath = _installSettings.UpdateZipPath,
 				});
 			};
 			NotifyOfPropertyChange(() => TotalFiles);

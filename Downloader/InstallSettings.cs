@@ -36,6 +36,16 @@ namespace Downloader
 		}
 
 		/// <summary>
+		/// Gets the path to the application's extracted executable.
+		/// </summary>
+		/// <returns>The path to the application's extracted executable.</returns>
+		public string GetApplicationExePath()
+		{
+			// Assume there's an executable in the install directory named after the application
+			return Path.Combine(InstallFolder, ApplicationInfo.Name + ".exe");
+		}
+
+		/// <summary>
 		/// Gets or sets the application info to use.
 		/// </summary>
 		public ApplicationResponse ApplicationInfo { get; set; }
@@ -54,6 +64,11 @@ namespace Downloader
 		/// Gets or sets the path to the application's zip file after it has been downloaded.
 		/// </summary>
 		public string ApplicationZipPath { get; set; }
+
+		/// <summary>
+		/// Gets or sets the path to the updater's zip file after it has been downloaded.
+		/// </summary>
+		public string UpdateZipPath { get; set; }
 
 		/// <summary>
 		/// Gets or sets a value indicating whether the application should be run when the downloader is finished.

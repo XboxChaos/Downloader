@@ -16,7 +16,7 @@ namespace Downloader.ViewModels
 		private readonly IShell _shell;
 		private readonly ApplicationSettings _applicationSettings;
 		private readonly InstallSettings _installSettings;
-		private NavigationPage[] _screens;
+		private List<NavigationPage> _screens;
 		private int _currentScreen;
 
 		private bool _canNext;
@@ -34,6 +34,10 @@ namespace Downloader.ViewModels
 				InitQuickMode();
 			else
 				InitManualMode();
+			
+			// Show the update screen in update mode
+			if (applicationSettings.Update)
+				_screens.Add(new UpdateViewModel(shell, applicationSettings, installSettings));
 
 			base.ActivateItem(_screens[0]);
 		}
@@ -96,7 +100,7 @@ namespace Downloader.ViewModels
 				return;
 
 			// If this is the last screen, then quit
-			if (_currentScreen >= _screens.Length - 1)
+			if (_currentScreen >= _screens.Count - 1)
 			{
 				Finish();
 				return;
@@ -111,18 +115,16 @@ namespace Downloader.ViewModels
 
 		public void Finish()
 		{
-			if (_installSettings.RunOnFinish)
+			if (!_applicationSettings.Update && _installSettings.RunOnFinish)
 				RunApplication();
 			_shell.Quit();
 		}
 
-		public void RunApplication()
+		private void RunApplication()
 		{
-			// Assume there's an executable in the install directory named after the application
-			var exePath = Path.Combine(_installSettings.InstallFolder, _installSettings.ApplicationInfo.Name + ".exe");
 			try
 			{
-				var startInfo = new ProcessStartInfo(exePath)
+				var startInfo = new ProcessStartInfo(_installSettings.GetApplicationExePath())
 				{
 					WorkingDirectory = _installSettings.InstallFolder,
 				};
@@ -137,7 +139,7 @@ namespace Downloader.ViewModels
 
 		public string ForwardText
 		{
-			get { return (_currentScreen < _screens.Length - 1) ? "Next" : "Finish"; }
+			get { return (_currentScreen < _screens.Count - 1) ? "Next" : "Finish"; }
 		}
 
 		public void XboxChaos()
@@ -152,19 +154,22 @@ namespace Downloader.ViewModels
 
 		private void InitManualMode()
 		{
-			_screens = new NavigationPage[]
+			_screens = new List<NavigationPage>
 			{
 				new SelectBranchViewModel(_shell, _applicationSettings, _installSettings),
  				new SelectFolderViewModel(_shell, _applicationSettings, _installSettings), 
 				new DownloadViewModel(_shell, _applicationSettings, _installSettings), 
 				new ExtractViewModel(_shell, _applicationSettings, _installSettings), 
-				new FinishViewModel(_shell, _applicationSettings, _installSettings), 
 			};
+
+			// Only show the finish screen if update mode isn't active
+			if (!_applicationSettings.Update)
+				_screens.Add(new FinishViewModel(_shell, _applicationSettings, _installSettings));
 		}
 
 		private void InitQuickMode()
 		{
-			_screens = new NavigationPage[]
+			_screens = new List<NavigationPage>
 			{
 				new DownloadViewModel(_shell, _applicationSettings, _installSettings), 
 				new ExtractViewModel(_shell, _applicationSettings, _installSettings), 
