@@ -21,6 +21,7 @@ namespace Downloader
 		{
 			BranchName = "master"; // Default to the master branch
 			TemporaryFiles = new TempFileCollection();
+			RunOnFinish = true;
 
 			// Default the install folder to the working directory
 			InstallFolder = Directory.GetCurrentDirectory();
@@ -53,6 +54,11 @@ namespace Downloader
 		/// Gets or sets the path to the application's zip file after it has been downloaded.
 		/// </summary>
 		public string ApplicationZipPath { get; set; }
+
+		/// <summary>
+		/// Gets or sets a value indicating whether the application should be run when the downloader is finished.
+		/// </summary>
+		public bool RunOnFinish { get; set; }
 
 		/// <summary>
 		/// Gets or sets a collection of temporary files to keep track of.

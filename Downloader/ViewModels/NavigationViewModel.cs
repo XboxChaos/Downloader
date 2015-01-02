@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using Caliburn.Micro;
 
 namespace Downloader.ViewModels
@@ -96,7 +98,7 @@ namespace Downloader.ViewModels
 			// If this is the last screen, then quit
 			if (_currentScreen >= _screens.Length - 1)
 			{
-				_shell.Quit();
+				Finish();
 				return;
 			}
 
@@ -105,6 +107,32 @@ namespace Downloader.ViewModels
 			CanGoBack = (_currentScreen > 0 && !(_screens[_currentScreen - 1] is ExtractViewModel)); // TODO: fix hax
 			ActivateItem(_screens[_currentScreen]);
 			NotifyOfPropertyChange(() => ForwardText);
+		}
+
+		public void Finish()
+		{
+			if (_installSettings.RunOnFinish)
+				RunApplication();
+			_shell.Quit();
+		}
+
+		public void RunApplication()
+		{
+			// Assume there's an executable in the install directory named after the application
+			var exePath = Path.Combine(_installSettings.InstallFolder, _installSettings.ApplicationInfo.Name + ".exe");
+			try
+			{
+				var startInfo = new ProcessStartInfo(exePath)
+				{
+					WorkingDirectory = _installSettings.InstallFolder,
+				};
+				Process.Start(startInfo);
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show("Unable to start the application:\n\n" + ex.Message, "Xbox Chaos Downloader", MessageBoxButton.OK,
+					MessageBoxImage.Error);
+			}
 		}
 
 		public string ForwardText
