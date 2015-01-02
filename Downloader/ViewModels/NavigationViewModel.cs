@@ -9,12 +9,12 @@ using Caliburn.Micro;
 
 namespace Downloader.ViewModels
 {
-	class NavigationViewModel : Conductor<object>.Collection.OneActive
+	class NavigationViewModel : Conductor<NavigationPage>.Collection.OneActive
 	{
 		private readonly IShell _shell;
 		private readonly ApplicationSettings _applicationSettings;
 		private readonly InstallSettings _installSettings;
-		private readonly Screen[] _screens;
+		private readonly NavigationPage[] _screens;
 		private int _currentScreen;
 
 		private bool _canNext;
@@ -27,7 +27,7 @@ namespace Downloader.ViewModels
 			_shell = shell;
 			_applicationSettings = applicationSettings;
 			_installSettings = installSettings;
-			_screens = new Screen[]
+			_screens = new NavigationPage[]
 			{
 				new SelectBranchViewModel(shell, applicationSettings, installSettings),
  				new SelectFolderViewModel(shell, applicationSettings, installSettings), 
@@ -90,14 +90,21 @@ namespace Downloader.ViewModels
 
 		public void GoForward()
 		{
-			_currentScreen++;
-			CanGoBack = (_currentScreen > 0 && !(_screens[_currentScreen - 1] is ExtractViewModel)); // TODO: fix hax
-			if (_currentScreen >= _screens.Length)
+			// Call the current screen's OnForward() method and cancel if it returns false
+			var currentPage = ActiveItem;
+			if (currentPage != null && !currentPage.OnForward())
+				return;
+
+			// If this is the last screen, then quit
+			if (_currentScreen >= _screens.Length - 1)
 			{
-				// Close after the last screen
 				_shell.Quit();
 				return;
 			}
+
+			// Advance to the next screen and update the UI
+			_currentScreen++;
+			CanGoBack = (_currentScreen > 0 && !(_screens[_currentScreen - 1] is ExtractViewModel)); // TODO: fix hax
 			ActivateItem(_screens[_currentScreen]);
 			NotifyOfPropertyChange(() => ForwardText);
 		}

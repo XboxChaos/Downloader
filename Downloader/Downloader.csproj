@@ -22,7 +22,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;OFFLINE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -84,13 +84,15 @@
     </Compile>
     <Compile Include="AppBootstrapper.cs" />
     <Compile Include="ApplicationSettings.cs" />
+    <Compile Include="PathUtil.cs" />
     <Compile Include="SizeUtil.cs" />
     <Compile Include="ViewModels\ConnectViewModel.cs" />
     <Compile Include="ViewModels\DownloadViewModel.cs" />
     <Compile Include="ViewModels\ExtractViewModel.cs" />
     <Compile Include="ViewModels\FinishViewModel.cs" />
-    <Compile Include="ViewModels\InstallSettings.cs" />
+    <Compile Include="InstallSettings.cs" />
     <Compile Include="ViewModels\AppViewModel.cs" />
+    <Compile Include="ViewModels\NavigationPage.cs" />
     <Compile Include="ViewModels\IShell.cs" />
     <Compile Include="ViewModels\NavigationViewModel.cs" />
     <Compile Include="ViewModels\SelectBranchViewModel.cs" />

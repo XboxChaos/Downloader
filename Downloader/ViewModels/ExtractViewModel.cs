@@ -12,7 +12,7 @@ using Caliburn.Micro;
 
 namespace Downloader.ViewModels
 {
-	class ExtractViewModel : Screen
+	class ExtractViewModel : NavigationPage
 	{
 		private readonly IShell _shell;
 		private readonly ApplicationSettings _applicationSettings;

@@ -12,7 +12,7 @@ using XboxChaos.Models;
 
 namespace Downloader.ViewModels
 {
-	class SelectBranchViewModel : Screen
+	class SelectBranchViewModel : NavigationPage
 	{
 		private readonly IShell _shell;
 		private readonly ApplicationSettings _applicationSettings;

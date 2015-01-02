@@ -8,7 +8,7 @@ using Caliburn.Micro;
 
 namespace Downloader.ViewModels
 {
-	class FinishViewModel : Screen
+	class FinishViewModel : NavigationPage
 	{
 		private readonly IShell _shell;
 		private readonly ApplicationSettings _applicationSettings;

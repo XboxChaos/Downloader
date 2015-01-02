@@ -11,7 +11,7 @@ using Caliburn.Micro;
 
 namespace Downloader.ViewModels
 {
-	class DownloadViewModel : Screen
+	class DownloadViewModel : NavigationPage
 	{
 		private const double UpdateInterval = 0.5;
 

@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using XboxChaos.Models;
 
-namespace Downloader.ViewModels
+namespace Downloader
 {
 	/// <summary>
 	/// Holds settings describing how the application should be installed.
@@ -20,8 +20,18 @@ namespace Downloader.ViewModels
 		public InstallSettings()
 		{
 			BranchName = "master"; // Default to the master branch
-			InstallFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location); // Default to the assembly directory
 			TemporaryFiles = new TempFileCollection();
+
+			// Default the install folder to the assembly directory
+			InstallFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+			try
+			{
+				// Attempt to clean up capitalization
+				InstallFolder = PathUtil.GetProperDirectoryCapitalization(InstallFolder);
+			}
+			catch
+			{
+			}
 		}
 
 		/// <summary>
