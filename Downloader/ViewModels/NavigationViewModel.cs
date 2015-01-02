@@ -95,7 +95,7 @@ namespace Downloader.ViewModels
 			if (_currentScreen >= _screens.Length)
 			{
 				// Close after the last screen
-				_shell.TryClose();
+				_shell.Quit();
 				return;
 			}
 			ActivateItem(_screens[_currentScreen]);

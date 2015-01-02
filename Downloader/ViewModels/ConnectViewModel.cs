@@ -30,7 +30,7 @@ namespace Downloader.ViewModels
 			_installSettings.ApplicationInfo = await LoadApplicationInfo();
 			if (_installSettings.ApplicationInfo == null)
 			{
-				_shell.TryClose();
+				_shell.Quit();
 				return;
 			}
 			_shell.GoForward();

@@ -22,6 +22,10 @@ namespace Downloader.ViewModels
 		private ApplicationSettings _applicationSettings;
 		private NavigationViewModel _navigation;
 
+		private bool _quitting = false;         // True if Quit() was called
+		private bool _waitingForUser = false;   // True if the user is being asked for input
+		private bool _waitingToAdvance = false; // True if we should move to the next page when the user is no longer being asked for input
+
 		[ImportingConstructor]
 		public AppViewModel(InstallSettings settings)
 		{
@@ -48,7 +52,13 @@ namespace Downloader.ViewModels
 
 		protected override void OnDeactivate(bool close)
 		{
-			_installSettings.TemporaryFiles.Delete();
+			try
+			{
+				_installSettings.TemporaryFiles.Delete();
+			}
+			catch (Exception)
+			{
+			}
 		}
 
 		/// <summary>
@@ -85,6 +95,11 @@ namespace Downloader.ViewModels
 
 		public void GoForward()
 		{
+			if (_waitingForUser)
+			{
+				_waitingToAdvance = true;
+				return;
+			}
 			if (_navigation != null)
 			{
 				_navigation.GoForward();
@@ -94,6 +109,32 @@ namespace Downloader.ViewModels
 				_navigation = new NavigationViewModel(this, _applicationSettings, _installSettings);
 				ActivateItem(_navigation);
 			}
+		}
+
+		public bool AskCloseQuestion(string question)
+		{
+			if (_quitting)
+				return true;
+			if (_waitingForUser)
+				return false;
+
+			_waitingForUser = true;
+			var result = MessageBox.Show(question, DisplayName, MessageBoxButton.YesNo, MessageBoxImage.Question,
+				MessageBoxResult.No);
+			_waitingForUser = false;
+
+			if (result == MessageBoxResult.Yes)
+				return true;
+
+			if (_waitingToAdvance)
+				GoForward();
+			return false;
+		}
+
+		public void Quit()
+		{
+			_quitting = true;
+			TryClose();
 		}
 	}
 }

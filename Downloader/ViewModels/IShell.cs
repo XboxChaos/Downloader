@@ -7,12 +7,16 @@ using Caliburn.Micro;
 
 namespace Downloader.ViewModels
 {
-	interface IShell : IClose
+	interface IShell
 	{
 		bool CanNavigate { get; set; }
 
 		bool CanGoForward { get; set; }
 
 		void GoForward();
+
+		void Quit();
+
+		bool AskCloseQuestion(string question);
 	}
 }

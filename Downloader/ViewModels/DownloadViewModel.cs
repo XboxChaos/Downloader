@@ -22,10 +22,9 @@ namespace Downloader.ViewModels
 		private readonly WebClient _client = new WebClient(); // WebClient to use
 		private DateTime _lastTime;                           // The last time a progress update occurred
 		private long _lastSize;                               // The last file size recorded
-		private bool _done;                                   // True if downloading is complete
-		private bool _waitingForUser;                         // True if a modal dialog is waiting for user input
 		private List<DownloadRequest> _downloadQueue;         // The files that need to be downloaded
 		private int _currentDownload;                         // Index of the current file being downloaded
+		private bool _done;                                   // True if done
 
 		private string _applicationName;
 		private int _percentComplete;
@@ -52,6 +51,12 @@ namespace Downloader.ViewModels
 			BeginDownload();
 		}
 
+		protected override void OnDeactivate(bool close)
+		{
+			if (!close)
+				_shell.CanNavigate = true;
+		}
+
 		public override void CanClose(Action<bool> callback)
 		{
 			if (_done)
@@ -59,41 +64,30 @@ namespace Downloader.ViewModels
 				callback(true);
 				return;
 			}
-
-			// Ask the user if they want to close first
-			_waitingForUser = true;
-			var result = MessageBox.Show("A file download is currently in progress.\r\nAre you sure you want to cancel it?",
-				"Xbox Chaos Downloader", MessageBoxButton.YesNo, MessageBoxImage.Question);
-			_waitingForUser = false;
-			if (result == MessageBoxResult.Yes)
+			var close = _shell.AskCloseQuestion("A file download is currently in progress.\nAre you sure you want to cancel it?");
+			if (close && _client.IsBusy)
 			{
-				// User wants to close - close if the download has already completed, or cancel the download otherwise
-				callback(_done);
+				callback(false);
 				_client.CancelAsync();
 				return;
 			}
-
-			// User doesn't want to close - signal that we're finished if the download has already completed
-			callback(false);
-			if (_done)
-				Finished();
+			callback(close);
 		}
 
 		private void OnDownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
 		{
+			_done = true;
 			if (e.Cancelled)
 			{
 				// A cancelled download indicates that the user wants to quit
-				_done = true;
-				_shell.TryClose();
+				_shell.Quit();
 				return;
 			}
 			if (e.Error != null)
 			{
-				MessageBox.Show("An error occurred while attempting to download " + ApplicationName + ":\r\n\r\n" + e.Error,
+				MessageBox.Show("An error occurred while attempting to download " + ApplicationName + ":\n\n" + e.Error,
 					"Xbox Chaos Downloader", MessageBoxButton.OK, MessageBoxImage.Error);
-				_done = true;
-				_shell.TryClose();
+				_shell.Quit();
 				return;
 			}
 
@@ -104,9 +98,7 @@ namespace Downloader.ViewModels
 			// Check if this was the last download
 			if (_currentDownload == _downloadQueue.Count - 1)
 			{
-				_done = true;
-				if (!_waitingForUser)
-					Finished(); // Signal that we're finished if we're not waiting for user input
+				Finished();
 				return;
 			}
 
@@ -148,19 +140,19 @@ namespace Downloader.ViewModels
 			{
 				MessageBox.Show("Unable to find the branch to download!", "Xbox Chaos Downloader", MessageBoxButton.OK,
 					MessageBoxImage.Error);
-				TryClose();
+				_shell.Quit();
 				return;
 			}
 			if (string.IsNullOrEmpty(branch.BuildDownload) || string.IsNullOrEmpty(branch.UpdaterDownload))
 			{
 				MessageBox.Show("The branch has invalid download links!", "Xbox Chaos Downloader", MessageBoxButton.OK,
 					MessageBoxImage.Error);
-				TryClose();
+				_shell.Quit();
 				return;
 			}
 
 			// Queue a download for the actual program
-			_installSettings.ApplicationZipPath = _installSettings.TemporaryFiles.AddExtension(".zip");
+			_installSettings.ApplicationZipPath = _installSettings.TemporaryFiles.AddExtension("zip");
 			_downloadQueue = new List<DownloadRequest>()
 			{
 				new DownloadRequest()
@@ -177,7 +169,7 @@ namespace Downloader.ViewModels
 				{
 					DisplayName = "updater",
 					Url = branch.UpdaterDownload,
-					ResultPath = _installSettings.TemporaryFiles.AddExtension(".zip"),
+					ResultPath = _installSettings.TemporaryFiles.AddExtension("zip"),
 				});
 			};
 			NotifyOfPropertyChange(() => TotalFiles);
@@ -201,7 +193,6 @@ namespace Downloader.ViewModels
 		/// </summary>
 		private void Finished()
 		{
-			_shell.CanNavigate = true;
 			_shell.GoForward();
 		}
 
