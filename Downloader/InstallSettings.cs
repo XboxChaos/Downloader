@@ -22,8 +22,8 @@ namespace Downloader
 			BranchName = "master"; // Default to the master branch
 			TemporaryFiles = new TempFileCollection();
 
-			// Default the install folder to the assembly directory
-			InstallFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+			// Default the install folder to the working directory
+			InstallFolder = Directory.GetCurrentDirectory();
 			try
 			{
 				// Attempt to clean up capitalization

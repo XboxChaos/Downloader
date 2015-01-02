@@ -23,5 +23,5 @@ Key | Description
 --- | -----------
 application_name | The internal name of the application to request from the API.
 default_branch | The name of the branch to select by default.
-quick | _Not implemented yet._ Whether or not "quick mode" should be activated. If this is set to true, then the user will never be prompted for input. The default branch for the application will be downloaded and installed in the same folder as the downloader.
+quick | Whether or not "quick mode" should be activated. If this is set to true, then the user will never be prompted for input. The default branch for the application will be downloaded and installed in the downloader's working directory.
 update | Whether or not the download should be treated as an update. If this is set to true, then the application's updater package will be downloaded and executed when the download completes.

@@ -14,7 +14,7 @@ namespace Downloader.ViewModels
 		private readonly IShell _shell;
 		private readonly ApplicationSettings _applicationSettings;
 		private readonly InstallSettings _installSettings;
-		private readonly NavigationPage[] _screens;
+		private NavigationPage[] _screens;
 		private int _currentScreen;
 
 		private bool _canNext;
@@ -27,14 +27,12 @@ namespace Downloader.ViewModels
 			_shell = shell;
 			_applicationSettings = applicationSettings;
 			_installSettings = installSettings;
-			_screens = new NavigationPage[]
-			{
-				new SelectBranchViewModel(shell, applicationSettings, installSettings),
- 				new SelectFolderViewModel(shell, applicationSettings, installSettings), 
-				new DownloadViewModel(shell, applicationSettings, installSettings), 
-				new ExtractViewModel(shell, applicationSettings, installSettings), 
-				new FinishViewModel(shell, applicationSettings, installSettings), 
-			};
+
+			if (applicationSettings.QuickMode)
+				InitQuickMode();
+			else
+				InitManualMode();
+
 			base.ActivateItem(_screens[0]);
 		}
 
@@ -122,6 +120,27 @@ namespace Downloader.ViewModels
 		public void GitHub()
 		{
 			Process.Start("https://www.github.com/XboxChaos");
+		}
+
+		private void InitManualMode()
+		{
+			_screens = new NavigationPage[]
+			{
+				new SelectBranchViewModel(_shell, _applicationSettings, _installSettings),
+ 				new SelectFolderViewModel(_shell, _applicationSettings, _installSettings), 
+				new DownloadViewModel(_shell, _applicationSettings, _installSettings), 
+				new ExtractViewModel(_shell, _applicationSettings, _installSettings), 
+				new FinishViewModel(_shell, _applicationSettings, _installSettings), 
+			};
+		}
+
+		private void InitQuickMode()
+		{
+			_screens = new NavigationPage[]
+			{
+				new DownloadViewModel(_shell, _applicationSettings, _installSettings), 
+				new ExtractViewModel(_shell, _applicationSettings, _installSettings), 
+			};
 		}
 	}
 }

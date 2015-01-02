@@ -29,7 +29,7 @@ namespace Downloader.ViewModels
 
 		protected override void OnInitialize()
 		{
-			// By default, the install path is set to the folder that the update manager is in
+			// By default, the install path is set to the working directory
 			// This is fine for quick mode, but in manual mode it's probably better to put the download in a subfolder
 			// So if this view is shown, then append a subdirectory named after the application onto the default path
 			InstallPath = Path.Combine(InstallPath, _installSettings.ApplicationInfo.Name);
