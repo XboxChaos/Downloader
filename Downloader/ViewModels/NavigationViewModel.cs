@@ -13,6 +13,8 @@ namespace Downloader.ViewModels
 {
 	class NavigationViewModel : Conductor<NavigationPage>.Collection.OneActive
 	{
+		private const string UpdaterName = "update.exe"; // Name of the updater program to run
+
 		private readonly IShell _shell;
 		private readonly ApplicationSettings _applicationSettings;
 		private readonly InstallSettings _installSettings;
@@ -34,10 +36,6 @@ namespace Downloader.ViewModels
 				InitQuickMode();
 			else
 				InitManualMode();
-			
-			// Show the update screen in update mode
-			if (applicationSettings.Update)
-				_screens.Add(new UpdateViewModel(shell, applicationSettings, installSettings));
 
 			base.ActivateItem(_screens[0]);
 		}
@@ -115,7 +113,9 @@ namespace Downloader.ViewModels
 
 		public void Finish()
 		{
-			if (!_applicationSettings.Update && _installSettings.RunOnFinish)
+			if (_applicationSettings.Update)
+				RunUpdater();
+			else if (_installSettings.RunOnFinish)
 				RunApplication();
 			_shell.Quit();
 		}
@@ -133,6 +133,28 @@ namespace Downloader.ViewModels
 			catch (Exception ex)
 			{
 				MessageBox.Show("Unable to start the application:\n\n" + ex.Message, "Xbox Chaos Downloader", MessageBoxButton.OK,
+					MessageBoxImage.Error);
+			}
+		}
+
+		private void RunUpdater()
+		{
+			var exePath = Path.Combine(Path.GetTempPath(), UpdaterName); // The updater is extracted to the temp directory
+			try
+			{
+				// Run the updater silently and then quit
+				var startInfo = new ProcessStartInfo(exePath)
+				{
+					Arguments = string.Format("\"{0}\" \"{1}\" {2}", _installSettings.ApplicationZipPath, _installSettings.GetApplicationExePath(), Process.GetCurrentProcess().Id), // <update zip> <exe> <parent pid>
+					WorkingDirectory = _installSettings.InstallFolder,
+					CreateNoWindow = true,
+					UseShellExecute = false
+				};
+				Process.Start(startInfo);
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show("Unable to start the updater:\n\n" + ex.Message, "Xbox Chaos Downloader", MessageBoxButton.OK,
 					MessageBoxImage.Error);
 			}
 		}

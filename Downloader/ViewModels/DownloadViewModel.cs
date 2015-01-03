@@ -153,7 +153,7 @@ namespace Downloader.ViewModels
 
 			// Queue a download for the actual program
 			_installSettings.ApplicationZipPath = Path.GetTempFileName();
-			_installSettings.TemporaryFiles.AddFile(_installSettings.ApplicationZipPath, false);
+			_installSettings.TemporaryFiles.AddFile(_installSettings.ApplicationZipPath, _applicationSettings.Update); // Keep the application zip in update mode
 			_downloadQueue = new List<DownloadRequest>()
 			{
 				new DownloadRequest()
