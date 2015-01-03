@@ -60,7 +60,7 @@ namespace Downloader.ViewModels
 				Description = "Multi-Generation Blam Engine Research Tool",
 				RepoUrl = "https://github.com/XboxChaos/Assembly",
 				RepoName = "Assembly",
-				ApplicationBranches = new ApplicationBranchResponse[]
+				ApplicationBranches = new List<ApplicationBranchResponse>
 				{
 					new ApplicationBranchResponse()
 					{
@@ -71,7 +71,6 @@ namespace Downloader.ViewModels
 						UpdaterDownload = "http://xboxchaos.com/assembly/updatetest/update.zip",
 						FriendlyVersion = "2014.12.34.56.78.90-master",
 						InternalVersion = "2.0.0.0",
-						Changelog = "Test changelog",
 					},
 					new ApplicationBranchResponse()
 					{
@@ -82,7 +81,6 @@ namespace Downloader.ViewModels
 						UpdaterDownload = "http://xboxchaos.com/assembly/updatetest/update.zip",
 						FriendlyVersion = "2014.12.34.56.78.90-dev",
 						InternalVersion = "2.0.0.0",
-						Changelog = "Test changelog",
 					},
 				},
 			};
