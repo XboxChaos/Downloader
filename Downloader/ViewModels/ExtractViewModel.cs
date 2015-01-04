@@ -37,8 +37,8 @@ namespace Downloader.ViewModels
 		protected override void OnActivate()
 		{
 			_shell.CanNavigate = false;
-			QueueZips();
-			StartExtraction();
+			if (QueueZips())
+				StartExtraction();
 		}
 
 		public override void CanClose(Action<bool> callback)
@@ -70,20 +70,21 @@ namespace Downloader.ViewModels
 				_installSettings.TemporaryFiles.Delete();
 		}
 
-		private void QueueZips()
+		private bool QueueZips()
 		{
 			try
 			{
 				// In updater mode, only unzip the updater, otherwise only unzip the application
 				// This is because the updater takes care of unzipping the application
 				QueueZip(_installSettings.UpdateZipPath ?? _installSettings.ApplicationZipPath);
+				return true;
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show("Unable to read the zip archives:\n\n" + ex.Message, "Xbox Chaos Downloader",
-					MessageBoxButton.OK, MessageBoxImage.Error);
-				_shell.Quit();
+				_done = true;
+				_shell.ShowError("Unable to read the zip archive!", ex.ToString());
 			}
+			return false;
 		}
 
 		private void QueueZip(string path)
@@ -111,9 +112,7 @@ namespace Downloader.ViewModels
 			}
 			if (e.Error != null)
 			{
-				MessageBox.Show("An error occurred while attempting to extract:\n\n" + e.Error,
-					"Xbox Chaos Downloader", MessageBoxButton.OK, MessageBoxImage.Error);
-				_shell.Quit();
+				_shell.ShowError("Unable to extract the zip archive!", e.Error.ToString());
 				return;
 			}
 			_shell.GoForward();
@@ -132,27 +131,18 @@ namespace Downloader.ViewModels
 
 		private void ExtractArchive(ZipArchive archive)
 		{
-			try
+			foreach (var entry in archive.Entries)
 			{
-				foreach (var entry in archive.Entries)
-				{
-					if (_worker.CancellationPending)
-						return;
-					CurrentFileName = entry.FullName;
-					var outDir = _applicationSettings.Update ? Path.GetTempPath() : _installSettings.InstallFolder; // Unzip to the temp dir in update mode
-					var outPath = Path.Combine(outDir, entry.FullName);
-					if (outPath.EndsWith("\\") || outPath.EndsWith("/"))
-						Directory.CreateDirectory(outPath);
-					else
-						entry.ExtractToFile(outPath, true);
-					TotalExtracted++;
-				}
-			}
-			catch (Exception ex)
-			{
-				Execute.OnUIThread(() => MessageBox.Show("Unable to extract the zip archives:\n\n" + ex.Message, "Xbox Chaos Downloader",
-					MessageBoxButton.OK, MessageBoxImage.Error));
-				_shell.Quit();
+				if (_worker.CancellationPending)
+					return;
+				CurrentFileName = entry.FullName;
+				var outDir = _applicationSettings.Update ? Path.GetTempPath() : _installSettings.InstallFolder; // Unzip to the temp dir in update mode
+				var outPath = Path.Combine(outDir, entry.FullName);
+				if (outPath.EndsWith("\\") || outPath.EndsWith("/"))
+					Directory.CreateDirectory(outPath);
+				else
+					entry.ExtractToFile(outPath, true);
+				TotalExtracted++;
 			}
 		}
 

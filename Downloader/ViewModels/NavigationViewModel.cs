@@ -117,7 +117,8 @@ namespace Downloader.ViewModels
 				RunUpdater();
 			else if (_installSettings.RunOnFinish)
 				RunApplication();
-			_shell.Quit();
+			else
+				_shell.Quit();
 		}
 
 		private void RunApplication()
@@ -129,11 +130,11 @@ namespace Downloader.ViewModels
 					WorkingDirectory = _installSettings.InstallFolder,
 				};
 				Process.Start(startInfo);
+				_shell.Quit();
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show("Unable to start the application:\n\n" + ex.Message, "Xbox Chaos Downloader", MessageBoxButton.OK,
-					MessageBoxImage.Error);
+				_shell.ShowError("Unable to start the application!", ex.ToString());
 			}
 		}
 
@@ -151,11 +152,11 @@ namespace Downloader.ViewModels
 					UseShellExecute = false
 				};
 				Process.Start(startInfo);
+				_shell.Quit();
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show("Unable to start the updater:\n\n" + ex.Message, "Xbox Chaos Downloader", MessageBoxButton.OK,
-					MessageBoxImage.Error);
+				_shell.ShowError("Unable to start the updater!", ex.ToString());
 			}
 		}
 

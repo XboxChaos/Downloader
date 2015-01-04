@@ -88,6 +88,7 @@
     <Compile Include="SizeUtil.cs" />
     <Compile Include="ViewModels\ConnectViewModel.cs" />
     <Compile Include="ViewModels\DownloadViewModel.cs" />
+    <Compile Include="ViewModels\ErrorViewModel.cs" />
     <Compile Include="ViewModels\ExtractViewModel.cs" />
     <Compile Include="ViewModels\FinishViewModel.cs" />
     <Compile Include="InstallSettings.cs" />
@@ -102,6 +103,9 @@
     </Compile>
     <Compile Include="Views\ConnectView.xaml.cs">
       <DependentUpon>ConnectView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ErrorView.xaml.cs">
+      <DependentUpon>ErrorView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ExtractView.xaml.cs">
       <DependentUpon>ExtractView.xaml</DependentUpon>
@@ -157,6 +161,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\ConnectView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ErrorView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

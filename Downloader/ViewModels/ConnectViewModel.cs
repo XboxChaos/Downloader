@@ -29,10 +29,7 @@ namespace Downloader.ViewModels
 		{
 			_installSettings.ApplicationInfo = await LoadApplicationInfo();
 			if (_installSettings.ApplicationInfo == null)
-			{
-				_shell.Quit();
 				return;
-			}
 			_shell.GoForward();
 		}
 
@@ -42,9 +39,9 @@ namespace Downloader.ViewModels
 			var response = await XboxChaosApi.GetApplicationInfoAsync(_applicationSettings.ApplicationName);
 			if (response.Error == null)
 				return response.Result;
-			MessageBox.Show(
-				"Unable to communicate with the server (" + response.Error.StatusCode + ", " + (int)response.Error.StatusCode + "):\n\n" +
-				response.Error.Description, "Xbox Chaos Downloader", MessageBoxButton.OK, MessageBoxImage.Error);
+			_shell.ShowError(
+				"Unable to communicate with the server! (" + response.Error.StatusCode + ", " + (int)response.Error.StatusCode + ")",
+				response.Error.Description);
 			return null;
 #else
 			await Task.Delay(1000);

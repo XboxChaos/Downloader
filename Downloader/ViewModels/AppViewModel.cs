@@ -21,20 +21,25 @@ namespace Downloader.ViewModels
 		private readonly InstallSettings _installSettings;
 		private ApplicationSettings _applicationSettings;
 		private NavigationViewModel _navigation;
+		private readonly ForceCloseStrategy<object> _forceClose;
 
+		private bool _initialized = false;      // True if initialized
 		private bool _quitting = false;         // True if Quit() was called
 		private bool _waitingForUser = false;   // True if the user is being asked for input
 		private bool _waitingToAdvance = false; // True if we should move to the next page when the user is no longer being asked for input
+		private ErrorViewModel _error;          // Non-null if an error occurred
 
 		[ImportingConstructor]
 		public AppViewModel(InstallSettings settings)
 		{
 			_installSettings = settings;
+			_forceClose = new ForceCloseStrategy<object>(CloseStrategy);
+			CloseStrategy = _forceClose;
 		}
 
 		protected override void OnInitialize()
 		{
-			DisplayName = "Xbox Chaos Downloader";
+			DisplayName = "Downloader";
 			try
 			{
 				_applicationSettings = LoadSettings();
@@ -48,6 +53,7 @@ namespace Downloader.ViewModels
 				return;
 			}
 			ActivateItem(new ConnectViewModel(this, _applicationSettings, _installSettings));
+			_initialized = true;
 		}
 
 		protected override void OnDeactivate(bool close)
@@ -95,6 +101,8 @@ namespace Downloader.ViewModels
 
 		public void GoForward()
 		{
+			if (_error != null)
+				return;
 			if (_waitingForUser)
 			{
 				_waitingToAdvance = true;
@@ -108,6 +116,8 @@ namespace Downloader.ViewModels
 			{
 				_navigation = new NavigationViewModel(this, _applicationSettings, _installSettings);
 				ActivateItem(_navigation);
+				if (_error != null)
+					ActivateItem(_error); // In case an error occurred during ActivateItem
 			}
 		}
 
@@ -135,6 +145,49 @@ namespace Downloader.ViewModels
 		{
 			_quitting = true;
 			TryClose();
+		}
+
+		public void ShowError(string caption, string details)
+		{
+			// If the application isn't initialized yet, fall back on a standard message box
+			if (!_initialized)
+			{
+				MessageBox.Show("Error: " + caption + Environment.NewLine + Environment.NewLine + details, DisplayName,
+					MessageBoxButton.OK, MessageBoxImage.Error);
+				Application.Current.Shutdown();
+				return;
+			}
+
+			_forceClose.Enabled = true; // Force all pages to close
+			_error = new ErrorViewModel(this, caption, details);
+			ActivateItem(_error);
+		}
+	}
+
+	/// <summary>
+	/// ICloseStrategy which allows closing to be forced.
+	/// </summary>
+	/// <typeparam name="T">The type of object to manage.</typeparam>
+	class ForceCloseStrategy<T> : ICloseStrategy<T>
+	{
+		private readonly ICloseStrategy<T> _baseStrategy;
+
+		public ForceCloseStrategy(ICloseStrategy<T> baseStrategy)
+		{
+			_baseStrategy = baseStrategy;
+		}
+
+		/// <summary>
+		/// Gets or sets a value indicating whether closing should be forced.
+		/// </summary>
+		public bool Enabled { get; set; }
+ 
+		public void Execute(IEnumerable<T> toClose, Action<bool, IEnumerable<T>> callback)
+		{
+			if (Enabled)
+				callback(true, Enumerable.Empty<T>());
+			else
+				_baseStrategy.Execute(toClose, callback);
 		}
 	}
 }

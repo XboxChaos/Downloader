@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Threading;
 using Caliburn.Micro;
 using Downloader.ViewModels;
 
@@ -27,6 +28,12 @@ namespace Downloader
 		{
 			DisplayRootViewFor<IShell>();
 			Application.MainWindow.ResizeMode = ResizeMode.CanMinimize;
+		}
+
+		protected override void OnUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+		{
+			e.Handled = true;
+			_container.GetExportedValue<IShell>().ShowError("An unexpected error occurred!", e.Exception.ToString());
 		}
 
 		protected override void Configure()

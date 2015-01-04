@@ -47,8 +47,8 @@ namespace Downloader.ViewModels
 		protected override void OnActivate()
 		{
 			_shell.CanNavigate = false;
-			QueueDownloads();
-			BeginDownload();
+			if (QueueDownloads())
+				BeginDownload();
 		}
 
 		protected override void OnDeactivate(bool close)
@@ -85,9 +85,7 @@ namespace Downloader.ViewModels
 			}
 			if (e.Error != null)
 			{
-				MessageBox.Show("An error occurred while attempting to download " + ApplicationName + ":\n\n" + e.Error,
-					"Xbox Chaos Downloader", MessageBoxButton.OK, MessageBoxImage.Error);
-				_shell.Quit();
+				_shell.ShowError("Unable to download " + ApplicationName + "!", e.Error.ToString());
 				return;
 			}
 
@@ -133,22 +131,21 @@ namespace Downloader.ViewModels
 		/// <summary>
 		/// Builds the download queue based off of information for the current branch.
 		/// </summary>
-		private void QueueDownloads()
+		/// <returns><c>true</c> if successful.</returns>
+		private bool QueueDownloads()
 		{
 			var branch = _installSettings.ApplicationInfo.ApplicationBranches.FirstOrDefault(b => b.Name == _installSettings.BranchName);
 			if (branch == null)
 			{
-				MessageBox.Show("Unable to find the branch to download!", "Xbox Chaos Downloader", MessageBoxButton.OK,
-					MessageBoxImage.Error);
-				_shell.Quit();
-				return;
+				_done = true;
+				_shell.ShowError("Unable to find the branch to download!", "branch is null");
+				return false;
 			}
 			if (string.IsNullOrEmpty(branch.BuildDownload) || string.IsNullOrEmpty(branch.UpdaterDownload))
 			{
-				MessageBox.Show("The branch has invalid download links!", "Xbox Chaos Downloader", MessageBoxButton.OK,
-					MessageBoxImage.Error);
-				_shell.Quit();
-				return;
+				_done = true;
+				_shell.ShowError("The branch has invalid download links!", "BuildDownload or UpdaterDownload is empty");
+				return false;
 			}
 
 			// Queue a download for the actual program
@@ -176,6 +173,7 @@ namespace Downloader.ViewModels
 				});
 			};
 			NotifyOfPropertyChange(() => TotalFiles);
+			return true;
 		}
 
 		/// <summary>

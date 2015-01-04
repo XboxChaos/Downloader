@@ -18,5 +18,7 @@ namespace Downloader.ViewModels
 		void Quit();
 
 		bool AskCloseQuestion(string question);
+
+		void ShowError(string caption, string details);
 	}
 }
