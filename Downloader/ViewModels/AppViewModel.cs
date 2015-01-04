@@ -39,7 +39,7 @@ namespace Downloader.ViewModels
 
 		protected override void OnInitialize()
 		{
-			DisplayName = "Downloader";
+			DisplayName = "Xbox Chaos Downloader";
 			try
 			{
 				_applicationSettings = LoadSettings();
