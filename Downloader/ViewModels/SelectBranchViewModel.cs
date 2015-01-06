@@ -56,7 +56,7 @@ namespace Downloader.ViewModels
 					{
 						Name = b.Name,
 						Description = (b.Name == "master") ? "(Recommended)" : "",
-						LatestVersion = b.FriendlyVersion
+						LatestVersion = b.Version.Friendly.ToString()
 					})
 				);
 		}

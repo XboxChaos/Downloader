@@ -33,7 +33,7 @@ namespace Downloader.ViewModels
 			{
 				return
 					_installSettings.ApplicationInfo.ApplicationBranches.First(b => b.Name == _installSettings.BranchName)
-						.FriendlyVersion;
+						.Version.Friendly.ToString();
 			}
 		}
 

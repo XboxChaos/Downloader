@@ -66,8 +66,7 @@ namespace Downloader.ViewModels
 						RepoTree = "master",
 						BuildDownload = "http://xboxchaos.com/assembly/updatetest/assembly.zip",
 						UpdaterDownload = "http://xboxchaos.com/assembly/updatetest/update.zip",
-						FriendlyVersion = "2014.12.34.56.78.90-master",
-						InternalVersion = "2.0.0.0",
+						Version = ApplicationVersionPair.TryParse("2014.01.02.03.04.05-master", "2.0.0.0"),
 					},
 					new ApplicationBranchResponse()
 					{
@@ -76,8 +75,7 @@ namespace Downloader.ViewModels
 						RepoTree = "dev",
 						BuildDownload = "http://xboxchaos.com/assembly/updatetest/assembly.zip",
 						UpdaterDownload = "http://xboxchaos.com/assembly/updatetest/update.zip",
-						FriendlyVersion = "2014.12.34.56.78.90-dev",
-						InternalVersion = "2.0.0.0",
+						Version = ApplicationVersionPair.TryParse("2014.01.02.03.04.05-dev", "2.0.0.0"),
 					},
 				},
 			};
