@@ -32,6 +32,7 @@ namespace Downloader.ViewModels
 		private string _totalSize;
 		private string _downloadSpeed;
 		private bool _displayProgress;
+		private string _timeRemaining;
 
 		[ImportingConstructor]
 		public DownloadViewModel(IShell shell, ApplicationSettings applicationSettings, InstallSettings installSettings)
@@ -114,13 +115,23 @@ namespace Downloader.ViewModels
 			if (_lastSize > 0 && elapsed < UpdateInterval)
 				return;
 
-			DownloadedSize = SizeUtil.FormatSizeForDisplay(e.BytesReceived);
-			TotalSize = SizeUtil.FormatSizeForDisplay(e.TotalBytesToReceive);
+			DownloadedSize = SizeDisplay.Format(e.BytesReceived);
+			TotalSize = SizeDisplay.Format(e.TotalBytesToReceive);
 			PercentComplete = (int)(100 * e.BytesReceived / e.TotalBytesToReceive);
 
 			if (elapsed >= UpdateInterval)
 			{
-				DownloadSpeed = SizeUtil.FormatRateForDisplay(e.BytesReceived - _lastSize, elapsed);
+				// Calculate download speed
+				var bytesTransferred = e.BytesReceived - _lastSize;
+				DownloadSpeed = SizeDisplay.FormateRate(bytesTransferred, elapsed);
+
+				// Calculate time remaining
+				var bytesPerSecond = (long)(bytesTransferred / elapsed);
+				var bytesRemaining = e.TotalBytesToReceive - e.BytesReceived;
+				var secondsRemaining = bytesRemaining / bytesPerSecond;
+				var remaining = new TimeSpan(0, 0, (int)secondsRemaining);
+				TimeRemaining = remaining.ToString();
+
 				_lastSize = e.BytesReceived;
 				_lastTime = currentTime;
 			}
@@ -272,6 +283,19 @@ namespace Downloader.ViewModels
 			{
 				_displayProgress = value;
 				NotifyOfPropertyChange(() => DisplayProgress);
+			}
+		}
+
+		/// <summary>
+		/// Gets or sets a string displaying the amount of time remaining.
+		/// </summary>
+		public string TimeRemaining
+		{
+			get { return _timeRemaining; }
+			set
+			{
+				_timeRemaining = value;
+				NotifyOfPropertyChange(() => TimeRemaining);
 			}
 		}
 

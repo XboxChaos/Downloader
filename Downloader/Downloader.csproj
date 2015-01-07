@@ -85,7 +85,7 @@
     <Compile Include="AppBootstrapper.cs" />
     <Compile Include="ApplicationSettings.cs" />
     <Compile Include="PathUtil.cs" />
-    <Compile Include="SizeUtil.cs" />
+    <Compile Include="SizeDisplay.cs" />
     <Compile Include="ViewModels\ConnectViewModel.cs" />
     <Compile Include="ViewModels\DownloadViewModel.cs" />
     <Compile Include="ViewModels\ErrorViewModel.cs" />
