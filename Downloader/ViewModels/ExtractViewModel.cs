@@ -136,12 +136,19 @@ namespace Downloader.ViewModels
 				if (_worker.CancellationPending)
 					return;
 				CurrentFileName = entry.FullName;
-				var outDir = _applicationSettings.Update ? Path.GetTempPath() : _installSettings.InstallFolder; // Unzip to the temp dir in update mode
-				var outPath = Path.Combine(outDir, entry.FullName);
+				var baseDir = _applicationSettings.Update ? Path.GetTempPath() : _installSettings.InstallFolder; // Unzip to the temp dir in update mode
+				var outPath = Path.Combine(baseDir, entry.FullName);
 				if (outPath.EndsWith("\\") || outPath.EndsWith("/"))
+				{
 					Directory.CreateDirectory(outPath);
+				}
 				else
+				{
+					var outDir = Path.GetDirectoryName(outPath);
+					if (outDir != null)
+						Directory.CreateDirectory(outDir);
 					entry.ExtractToFile(outPath, true);
+				}
 				TotalExtracted++;
 			}
 		}
